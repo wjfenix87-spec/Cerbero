@@ -14,6 +14,9 @@ urlpatterns = [
     path('cookies/', TemplateView.as_view(template_name='core/cookies.html'), name='cookies'),
     path('api/auth/', include('users.urls')),
     path('api/', include('core.urls')),
+    path('api/projects/', include('projects.urls')),
+    
+
 ]
 
 if settings.DEBUG:
