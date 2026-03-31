@@ -13,6 +13,7 @@ urlpatterns = [
     path('privacy/', TemplateView.as_view(template_name='core/privacy.html'), name='privacy'),
     path('cookies/', TemplateView.as_view(template_name='core/cookies.html'), name='cookies'),
     path('api/auth/', include('users.urls')),
+    path('api/', include('core.urls')),
 ]
 
 if settings.DEBUG:
