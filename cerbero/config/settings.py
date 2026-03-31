@@ -30,9 +30,9 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-(2xol%-^83!$)z4mtu#g-pyz6n
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = ['cerbero.onrender.com', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['*']
 
-CORS_ALLOW_ALL_ORIGINS = ['https://cerbero.onrender.com']
+CORS_ALLOW_ALL_ORIGINS = True
 
 AUTH_USER_MODEL = 'users.User'
 
@@ -75,6 +75,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'rest_framework_simplejwt',
+    'whitenoise',
 
 ]
 
@@ -87,6 +88,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -198,7 +200,7 @@ SIMPLE_JWT = {
 }
 
 # Seguridad para producción
-CSRF_TRUSTED_ORIGINS = ['https://tu-cerbero.onrender.com']
+CSRF_TRUSTED_ORIGINS = ['https://cerbero.onrender.com']
 
 if not DEBUG:
     SECURE_SSL_REDIRECT = True
