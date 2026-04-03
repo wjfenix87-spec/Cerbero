@@ -376,28 +376,32 @@
                     </div>
                 </div>
                 <div class="upload-zone-cyber" id="uploadZone" style="cursor: pointer;">
-                    <div class="upload-content">
-                        <div class="upload-icon-cyber">📁</div>
-                        <h4 style="font-family: 'Space Grotesk', sans-serif; font-size: 1.5rem; margin-bottom: 15px;">ZONA DE TRANSFERENCIA</h4>
-                        <p style="color: rgba(255,255,255,0.5); margin-bottom: 25px;">Arrastra archivos aquí o haz clic para explorar</p>
-                        <div id="uploadStatus" style="margin-top: 15px; color: var(--neon-green);"></div>
-                        <div class="expiration-selector" style="margin: 20px 0;">
-                            <label style="color: var(--neon-blue); font-family: monospace;">⏱️ EXPIRACIÓN:</label>
-                            <select id="expirationSelect" style="background: var(--dark-3); border: 1px solid rgba(0,243,255,0.3); color: #fff; padding: 8px 12px; border-radius: 6px; margin-left: 10px;">
-                                <option value="">Nunca expira</option>
-                                <option value="24">24 horas</option>
-                                <option value="168">7 días</option>
-                                <option value="720">30 días</option>
-                            </select>
-                        </div>
-                        <div class="legal-notice" style="margin-top: 15px; font-size: 0.7rem; color: rgba(255,255,255,0.4); text-align: center;">
-                            Al subir archivos, aceptas nuestros 
-                            <a href="/terms/" style="color: var(--neon-blue);">Términos</a> y 
-                            <a href="/privacy/" style="color: var(--neon-blue);">Política de Privacidad</a>. 
-                            Cerbero no se responsabiliza por el uso indebido de los enlaces compartidos.
-                        </div>
-                    </div>
-                </div>
+    <div class="upload-content">
+        <div class="upload-icon-cyber">📁</div>
+        <h4 style="font-family: 'Space Grotesk', sans-serif; font-size: 1.5rem; margin-bottom: 15px;">ZONA DE TRANSFERENCIA</h4>
+        <p style="color: rgba(255,255,255,0.5); margin-bottom: 25px;">
+            📁 Arrastra una CARPETA (proyectos pequeños)<br>
+            📦 Arrastra un ZIP (proyectos grandes)
+        </p>
+        
+        <div style="display: flex; gap: 15px; justify-content: center; margin-bottom: 20px;">
+            <button id="uploadFolderBtn" class="btn-cyber btn-cyber-outline" style="padding: 10px 20px;">📁 Subir Carpeta</button>
+            <button id="uploadZipBtn" class="btn-cyber btn-cyber-outline" style="padding: 10px 20px;">📦 Subir ZIP</button>
+        </div>
+        
+        <div id="uploadStatus" style="margin-top: 15px; color: var(--neon-green);"></div>
+        
+        <div class="expiration-selector" style="margin: 20px 0;">
+            <label style="color: var(--neon-blue); font-family: monospace;">⏱️ EXPIRACIÓN:</label>
+            <select id="expirationSelect" style="background: var(--dark-3); border: 1px solid rgba(0,243,255,0.3); color: #fff; padding: 8px 12px; border-radius: 6px; margin-left: 10px;">
+                <option value="">Nunca expira</option>
+                <option value="24">24 horas</option>
+                <option value="168">7 días</option>
+                <option value="720">30 días</option>
+            </select>
+        </div>
+    </div>
+</div>
             </div>
         </div>
     </section>
