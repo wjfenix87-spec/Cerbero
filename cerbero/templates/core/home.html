@@ -354,8 +354,16 @@
                     <div class="progress-cyber"><div class="progress-fill-cyber" id="progressFill"></div></div>
                     <div class="success-cyber" id="successMessage" style="display: none;"><span>✓</span> ENCRIPTACIÓN COMPLETADA — ENLACE GENERADO</div>
                     <div class="link-generated" id="linkGenerated" style="display: none;">
-                        <span class="link-url-cyber" id="generatedLink">🔒 https://cerb.ro/p/</span>
-                        <span style="color: var(--neon-blue); cursor: pointer;" onclick="copyLink()">[COPIAR]</span>
+                        <div class="link-box">
+                        <span class="link-url-cyber" id="generatedLink">🔒 https://cerbero.com/p/</span>
+                        <button class="link-btn" onclick="copyLink('normal')">📋copiar</button>
+                        </div>
+                        <div class="link-box" id="iaLinkBox" style="display: none;">
+                            <span class="link-url-cyber" id="generatedIaLink">🤖 https://cerbero.com/p/?mode=ia</span>
+                            <button class="link-btn" onclick="copyLink('ia')">📋copiar para la IA</button>
+                            <span style="color: var(--neon-blue); cursor: pointer;" onclick="copyLink()">[COPIAR]</span>
+                        </div>
+                        
                     </div>
                 </div>
             </div>
@@ -575,6 +583,14 @@
             document.getElementById('modalTitle').textContent = 'ACCESO'; 
         }
 
+        function copyLink(type) {
+        const link = type === 'ia' 
+        ? document.getElementById('generatedIaLink').innerText.replace('🤖 ', '')
+        : document.getElementById('generatedLink').innerText.replace('🔒 ', '');
+    navigator.clipboard.writeText(link);
+    alert(type === 'ia' ? '🤖 Enlace IA copiado' : '🔗 Enlace copiado');
+}
+
         // ==================== ZONA DE TRANSFERENCIA ====================
         const fileInput = document.createElement('input');
         fileInput.type = 'file';
@@ -613,7 +629,8 @@
                     if (statusDiv) statusDiv.innerHTML = `✅ Subidos ${data.count} archivos correctamente`;
                     document.getElementById('successMessage').style.display = 'flex';
                     const fullUrl = `${window.location.origin}${data.url}`;
-                    document.getElementById('generatedLink').innerHTML = `🔒 ${fullUrl}`;
+                    const iaUrl = `${fullUrl}?mode=ia`;
+                    document.getElementById('generatedLink').innerHTML = `🔗 Enlace normal ${fullUrl}<br> Enlace IA: ${iaUrl}`;
                     document.getElementById('linkGenerated').style.display = 'flex';
                     setTimeout(() => window.location.href = data.url, 2000);
                 } else {
@@ -702,6 +719,194 @@
         init();
         
         window.copyLink = () => { navigator.clipboard.writeText(document.getElementById('generatedLink')?.innerText.replace('🔒 ', '') || ''); alert('Enlace copiado'); };
+   
+   // ==================== SUBIR CARPETA ====================
+const folderInput = document.createElement('input');
+folderInput.type = 'file';
+folderInput.multiple = true;
+folderInput.webkitdirectory = true;  // 👈 PERMITE SELECCIONAR CARPETA
+folderInput.directory = true;
+folderInput.style.display = 'none';
+document.body.appendChild(folderInput);
+
+// ==================== SUBIR ZIP ====================
+const zipInput = document.createElement('input');
+zipInput.type = 'file';
+zipInput.accept = '.zip,.rar,.7z';
+zipInput.style.display = 'none';
+document.body.appendChild(zipInput);
+
+// Función para subir carpeta
+async function uploadFolder(files) {
+    if (!files.length) return;
+    
+    const formData = new FormData();
+    for (let file of files) {
+        // Guardar la ruta relativa para mantener estructura
+        const relativePath = file.webkitRelativePath || file.name;
+        formData.append('files', file);
+        formData.append('paths', relativePath);
+    }
+    
+    const expirationSelect = document.getElementById('expirationSelect');
+    if (expirationSelect && expirationSelect.value) {
+        formData.append('expiration', expirationSelect.value);
+    }
+    
+    if (accessToken) {
+        formData.append('user', currentUser?.id);
+    }
+    
+    const statusDiv = document.getElementById('uploadStatus');
+    if (statusDiv) statusDiv.textContent = `📤 Subiendo carpeta con ${files.length} archivos...`;
+    
+    try {
+        const res = await fetch('/p/api/upload-folder/', {
+            method: 'POST',
+            body: formData,
+            headers: accessToken ? { 'Authorization': `Bearer ${accessToken}` } : {}
+        });
+        const data = await res.json();
+        
+        if (data.success) {
+            statusDiv.innerHTML = `✅ Subida carpeta con ${data.count} archivos correctamente`;
+            document.getElementById('successMessage').style.display = 'flex';
+            const fullUrl = `${window.location.origin}${data.url}`;
+            document.getElementById('generatedLink').innerHTML = `🔒 ${fullUrl}`;
+            document.getElementById('linkGenerated').style.display = 'flex';
+            setTimeout(() => window.location.href = data.url, 2000);
+        } else {
+            statusDiv.innerHTML = `❌ Error: ${data.error}`;
+        }
+    } catch(error) {
+        statusDiv.innerHTML = '❌ Error de conexión';
+    }
+}
+
+// Función para subir ZIP
+async function uploadZip(file) {
+    if (!file) return;
+    
+    const formData = new FormData();
+    formData.append('zip_file', file);
+    
+    const expirationSelect = document.getElementById('expirationSelect');
+    if (expirationSelect && expirationSelect.value) {
+        formData.append('expiration', expirationSelect.value);
+    }
+    
+    if (accessToken) {
+        formData.append('user', currentUser?.id);
+    }
+    
+    const statusDiv = document.getElementById('uploadStatus');
+    if (statusDiv) statusDiv.textContent = `📦 Subiendo y descomprimiendo ZIP...`;
+    
+    try {
+        const res = await fetch('/p/api/upload-zip/', {
+            method: 'POST',
+            body: formData,
+            headers: accessToken ? { 'Authorization': `Bearer ${accessToken}` } : {}
+        });
+        const data = await res.json();
+        
+        if (data.success) {
+            statusDiv.innerHTML = `✅ Subido ZIP con ${data.count} archivos descomprimidos`;
+            document.getElementById('successMessage').style.display = 'flex';
+            const fullUrl = `${window.location.origin}${data.url}`;
+            document.getElementById('generatedLink').innerHTML = `🔒 ${fullUrl}`;
+            document.getElementById('linkGenerated').style.display = 'flex';
+            setTimeout(() => window.location.href = data.url, 2000);
+        } else {
+            statusDiv.innerHTML = `❌ Error: ${data.error}`;
+        }
+    } catch(error) {
+        statusDiv.innerHTML = '❌ Error de conexión';
+    }
+}
+
+// Event listeners
+document.getElementById('uploadFolderBtn')?.addEventListener('click', () => folderInput.click());
+document.getElementById('uploadZipBtn')?.addEventListener('click', () => zipInput.click());
+
+folderInput.onchange = (e) => {
+    uploadFolder(Array.from(e.target.files));
+    folderInput.value = '';
+};
+
+zipInput.onchange = (e) => {
+    if (e.target.files.length) {
+        uploadZip(e.target.files[0]);
+    }
+    zipInput.value = '';
+};
+
+// Arrastrar carpeta
+uploadZone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    uploadZone.style.borderColor = 'var(--neon-blue)';
+    uploadZone.style.background = 'rgba(0, 243, 255, 0.1)';
+});
+
+uploadZone.addEventListener('dragleave', () => {
+    uploadZone.style.borderColor = 'rgba(0, 243, 255, 0.3)';
+    uploadZone.style.background = 'var(--dark-3)';
+});
+
+uploadZone.addEventListener('drop', async (e) => {
+    e.preventDefault();
+    uploadZone.style.borderColor = 'rgba(0, 243, 255, 0.3)';
+    uploadZone.style.background = 'var(--dark-3)';
+    
+    const items = e.dataTransfer.items;
+    const files = [];
+    
+    for (let item of items) {
+        const entry = item.webkitGetAsEntry();
+        if (entry) {
+            const allFiles = await getAllFilesFromEntry(entry);
+            files.push(...allFiles);
+        }
+    }
+    
+    if (files.length > 0) {
+        // Si hay un archivo .zip, procesarlo como ZIP
+        const zipFile = files.find(f => f.name.endsWith('.zip'));
+        if (zipFile && files.length === 1) {
+            uploadZip(zipFile);
+        } else {
+            uploadFolder(files);
+        }
+    }
+});
+
+// Función recursiva para leer carpetas
+async function getAllFilesFromEntry(entry) {
+    const files = [];
+    if (entry.isFile) {
+        return new Promise((resolve) => {
+            entry.file(file => {
+                file.webkitRelativePath = entry.fullPath.slice(1);
+                resolve([file]);
+            });
+        });
+    } else if (entry.isDirectory) {
+        const reader = entry.createReader();
+        return new Promise((resolve) => {
+            reader.readEntries(async (entries) => {
+                let allFiles = [];
+                for (let ent of entries) {
+                    const subFiles = await getAllFilesFromEntry(ent);
+                    allFiles = allFiles.concat(subFiles);
+                }
+                resolve(allFiles);
+            });
+        });
+    }
+    return files;
+}
+
     </script>
+
 </body>
 </html>
