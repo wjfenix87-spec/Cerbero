@@ -383,7 +383,7 @@
                         <div class="step-cyber"><div class="step-num-cyber">3</div><div class="step-content-cyber"><h4>Comparte con cualquier IA</h4><p>ChatGPT, Claude, Gemini, Copilot... todas entienden</p></div></div>
                     </div>
                 </div>
-                <div class="upload-zone-cyber" id="uploadZone" style="cursor: pointer;">
+              <div class="upload-zone-cyber" id="uploadZone" style="cursor: pointer;">
     <div class="upload-content">
         <div class="upload-icon-cyber">📁</div>
         <h4 style="font-family: 'Space Grotesk', sans-serif; font-size: 1.5rem; margin-bottom: 15px;">ZONA DE TRANSFERENCIA</h4>
@@ -399,15 +399,17 @@
         
         <div id="uploadStatus" style="margin-top: 15px; color: var(--neon-green);"></div>
         
-        <div class="expiration-selector" style="margin: 20px 0;">
+        <!-- 👇 SELECTOR DE EXPIRACIÓN (AHORA NO DISPARA SUBIDA) -->
+        <div class="expiration-selector" style="margin: 20px 0; padding: 10px; border-top: 1px solid rgba(0, 243, 255, 0.2); cursor: default;">
             <label style="color: var(--neon-blue); font-family: monospace;">⏱️ EXPIRACIÓN:</label>
-            <select id="expirationSelect" style="background: var(--dark-3); border: 1px solid rgba(0,243,255,0.3); color: #fff; padding: 8px 12px; border-radius: 6px; margin-left: 10px;">
+            <select id="expirationSelect" style="background: var(--dark-3); border: 1px solid rgba(0,243,255,0.3); color: #fff; padding: 8px 12px; border-radius: 6px; margin-left: 10px; cursor: pointer;">
                 <option value="">Nunca expira</option>
                 <option value="24">24 horas</option>
                 <option value="168">7 días</option>
                 <option value="720">30 días</option>
             </select>
         </div>
+    </div>
     </div>
 </div>
             </div>
@@ -647,7 +649,12 @@
         
         const uploadZone = document.getElementById('uploadZone');
         if (uploadZone) {
-            uploadZone.addEventListener('click', triggerUpload);
+            uploadZone.addEventListener('click',(e)=>{
+                if (e.target.closest('.expiration-selector')) {
+                    return;
+                }
+                triggerUpload();
+            });
             
             fileInput.onchange = (e) => {
                 uploadFiles(Array.from(e.target.files));
