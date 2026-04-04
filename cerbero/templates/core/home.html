@@ -264,30 +264,39 @@
             .quote-wow { margin: 20px; }
             .badges { margin: 20px; }
         }
+
+        .expiration-selector select {
+    border: 2px solid var(--neon-blue) !important;
+    background: var(--dark-2) !important;
+    font-weight: bold;
+}
+.expiration-selector label {
+    text-shadow: 0 0 5px var(--neon-blue);
+}
     </style>
 </head>
 <body>
     <div class="modal-overlay" id="authModal">
-        <div class="modal-cyber">
-            <span class="close-modal" onclick="closeAuthModal()">×</span>
-            <h2 id="modalTitle">ACCESO</h2>
-            <div id="loginForm">
-                <input type="text" id="loginUsername" placeholder="USUARIO">
-                <input type="password" id="loginPassword" placeholder="CONTRASEÑA">
-                <div id="loginError" class="error-message"></div>
-                <button class="btn-cyber btn-cyber-fill" onclick="handleLogin()">INGRESAR</button>
-                <div class="switch-mode" onclick="switchToRegister()">¿No tienes cuenta? Regístrate →</div>
-            </div>
-            <div id="registerForm" style="display: none;">
-                <input type="text" id="regUsername" placeholder="USUARIO">
-                <input type="email" id="regEmail" placeholder="EMAIL">
-                <input type="password" id="regPassword" placeholder="CONTRASEÑA">
-                <div id="registerError" class="error-message"></div>
-                <button class="btn-cyber btn-cyber-fill" onclick="handleRegister()">REGISTRARSE</button>
-                <div class="switch-mode" onclick="switchToLogin()">← Ya tengo cuenta</div>
-            </div>
+    <div class="modal-cyber">
+        <span class="close-modal" onclick="closeAuthModal()">×</span>
+        <h2 id="modalTitle">ACCESO</h2>
+        <div id="loginForm">
+            <input type="text" id="loginUsername" placeholder="USUARIO">
+            <input type="password" id="loginPassword" placeholder="CONTRASEÑA">
+            <div id="loginError" class="error-message"></div>
+            <button class="btn-cyber btn-cyber-fill" onclick="handleLogin()">INGRESAR</button>
+            <div class="switch-mode" onclick="switchToRegister()">¿No tienes cuenta? Regístrate →</div>
+        </div>
+        <div id="registerForm" style="display: none;">
+            <input type="text" id="regUsername" placeholder="USUARIO">
+            <input type="email" id="regEmail" placeholder="EMAIL">
+            <input type="password" id="regPassword" placeholder="CONTRASEÑA">
+            <div id="registerError" class="error-message"></div>
+            <button class="btn-cyber btn-cyber-fill" onclick="handleRegister()">REGISTRARSE</button>
+            <div class="switch-mode" onclick="switchToLogin()">← Ya tengo cuenta</div>
         </div>
     </div>
+</div>
 
     <div class="bg-cyber"></div>
     <div class="grid-overlay"></div>
@@ -304,14 +313,15 @@
             <a href="#demo">Cómo funciona</a>
             <a href="#dashboard" id="dashboardLink" style="display: none;">Mis proyectos</a>
             <a href="/profile/" id="profileLink" style="display: none;">Mi perfil</a>
+            <a href="/docs/">Documentación</a>
         </nav>
         <div class="header-actions">
             <div class="matrix-toggle" id="matrixToggle">
                 <div class="matrix-toggle-knob">💊</div>
             </div>
             <div id="authButtons">
-                <button class="btn-cyber btn-cyber-outline" onclick="openAuthModal()">REGISTRARSE</button>
-                <button class="btn-cyber btn-cyber-fill" onclick="openAuthModal()">INGRESAR</button>
+                <button class="btn-cyber btn-cyber-outline" onclick="openAuthModal('register')">REGISTRARSE</button>
+                <button class="btn-cyber btn-cyber-fill" onclick="openAuthModal('login')">INGRESAR</button>
             </div>
             <div id="userInfo" style="display: none;" class="user-info">
                 <div class="user-avatar">🐕</div>
@@ -326,10 +336,9 @@
             <div class="hero-text-cyber">
                 <div class="cyber-badge">SISTEMA OPERATIVO: ONLINE</div>
                 <h1 class="hero-title-cyber"><span class="line-1">El guardián</span><span class="line-2">del contexto digital</span></h1>
-                <p class="hero-subtitle-cyber">Rompe la barrera entre tu código y la IA. Sube tu proyecto, genera un enlace cifrado, y deja que cualquier inteligencia artificial acceda a tu contexto completo.</p>
+                <p class="hero-subtitle-cyber"><strong>Sube tu proyecto. Comparte el enlace. La IA lo analiza completo.</strong></p>
                 <div class="hero-cta-cyber">
-                    <button class="btn-cyber btn-cyber-fill btn-cyber-large" id="openUploadBtn">🚀 Inicializar sistema</button>
-                    <button class="btn-cyber btn-cyber-outline btn-cyber-large">📖 Ver documentación</button>
+                    <button class="btn-cyber btn-cyber-outline btn-cyber-large" id="docsBtn">📖 Ver documentación</button>
                 </div>
                 <div class="hero-stats-cyber">
                     <div class="stat-cyber"><div class="stat-value-cyber">∞</div><div class="stat-label-cyber">Proyectos ilimitados</div></div>
@@ -423,7 +432,7 @@
             <p class="section-desc-cyber">Todos tus proyectos en un solo lugar. Accede a ellos cuando quieras.</p>
         </div>
         <div class="projects-grid" id="projectsGrid">
-            <div style="text-align: center; grid-column: 1/-1; color: rgba(255,255,255,0.5);">Inicia sesión para ver tus proyectos</div>
+            <div style="text-align: center; grid-column: 1/-1; color: rgba(255,255,255,0.5);"></div>
         </div>
     </section>
 
@@ -442,14 +451,13 @@
     <div class="badges"><span class="badge"><span>⚡</span> 100% GRATIS</span><span class="badge"><span>💳</span> SIN TARJETAS</span><span class="badge"><span>🚫</span> SIN LÍMITES TONTOS</span><span class="badge"><span>🔒</span> PRIVACIDAD CONTROLADA</span><span class="badge"><span>🌐</span> ENLACE ÚNICO</span></div>
 
     <section class="cta-final">
-        <div class="cta-box"><h2>Listo para liberar<br>el potencial de tus IAs?</h2><p>Únete a la revolución. Sube tu primer proyecto gratis, sin tarjetas, sin compromisos.</p><div class="cta-buttons-final"><button class="btn-cyber btn-cyber-fill btn-cyber-large" id="ctaUploadBtn">🚀 Subir proyecto ahora</button><button class="btn-cyber btn-cyber-outline btn-cyber-large">📺 Ver demo</button></div></div>
+        <div class="cta-box"><h2>Listo para liberar<br>el potencial de tus IAs?</h2><p>Únete a la revolución. Sube tu primer proyecto gratis, sin tarjetas, sin compromisos.</p><div class="cta-buttons-final">
     </section>
 
     <footer class="footer-cyber">
         <div class="footer-grid">
             <div class="footer-brand"><div class="logo-glitch" style="font-size: 1.5rem;">🐕 CERBERO</div><p>El guardián del contexto digital. Rompiendo barreras entre tu código y las IAs desde 2026.</p></div>
-            <div class="footer-links"><h4>Producto</h4><ul><li><a href="#features">Características</a></li><li><a href="#">Precios</a></li><li><a href="#">API</a></li></ul></div>
-            <div class="footer-links"><h4>Recursos</h4><ul><li><a href="#">Documentación</a></li><li><a href="#">Blog</a></li><li><a href="#">Soporte</a></li></ul></div>
+            <div class="footer-links"><h4>Recursos</h4><ul><li><a href="#">Documentación</a></li><li><a href="#">Soporte</a></li></ul></div>
             <div class="footer-links"><h4>Legal</h4><ul><li><a href="/privacy/">Privacidad</a></li><li><a href="/terms/">Términos</a></li><li><a href="/cookies/">Cookies</a></li></ul></div>
         </div>
         <div class="footer-bottom-cyber"><div class="footer-copyright">© 2026 Cerbero · Todos los derechos guardados</div><div class="social-cyber"><a href="#" class="social-btn-cyber">🐙</a><a href="#" class="social-btn-cyber">𝕏</a><a href="#" class="social-btn-cyber">💬</a></div></div>
@@ -568,9 +576,24 @@
             } catch(e) { alert('Error'); }
         }
 
-        function openAuthModal() { 
-            document.getElementById('authModal').classList.add('active'); 
-        }
+        function openAuthModal(mode = 'login') {
+    const modal = document.getElementById('authModal');
+    const loginForm = document.getElementById('loginForm');
+    const registerForm = document.getElementById('registerForm');
+    const modalTitle = document.getElementById('modalTitle');
+    
+    if (mode === 'register') {
+        loginForm.style.display = 'none';
+        registerForm.style.display = 'block';
+        modalTitle.textContent = 'REGISTRO';
+    } else {
+        loginForm.style.display = 'block';
+        registerForm.style.display = 'none';
+        modalTitle.textContent = 'ACCESO';
+    }
+    
+    modal.classList.add('active');
+}
         function closeAuthModal() { 
             document.getElementById('authModal').classList.remove('active'); 
         }
@@ -653,7 +676,15 @@
                 if (e.target.closest('.expiration-selector')) {
                     return;
                 }
-                triggerUpload();
+                    if (!e.target.closest('#uploadFolderBtn') && !e.target.closest('#uploadZipBtn')) {
+        return;
+    }
+    // Si llegamos aquí, fue clic en un botón → activar la subida correspondiente
+    if (e.target.closest('#uploadFolderBtn')) {
+        folderInput.click();
+    } else if (e.target.closest('#uploadZipBtn')) {
+        zipInput.click();
+    }
             });
             
             fileInput.onchange = (e) => {
@@ -912,7 +943,9 @@ async function getAllFilesFromEntry(entry) {
     }
     return files;
 }
-
+document.getElementById('docsBtn')?.addEventListener('click', () => {
+    window.location.href = '/docs/';
+});
     </script>
 
 </body>

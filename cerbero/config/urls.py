@@ -15,7 +15,7 @@ urlpatterns = [
     path('api/auth/', include('users.urls')),
     path('api/', include('core.urls')),
     path('api/projects/', include('projects.urls')),
-    
+    path('docs/', TemplateView.as_view(template_name='core/docs.html'), name='docs'),
 
 ]
 
