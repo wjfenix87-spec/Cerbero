@@ -111,15 +111,19 @@
         <h2>Proyecto: {{ project.slug }}</h2>
         
         <div class="mode-buttons">
-            <a href="?mode=humano" class="btn">👁️ Modo Humano</a>
             <a href="?mode=ia" class="btn">🤖 Modo IA</a>
-            <a href="?mode=text" class="btn">📄 Texto Plano</a>
             <a href="{% url 'download-for-ia' slug=project.slug %}" class="btn">📥 Descargar TXT</a>
+            <button onclick="copyMigrationPrompt()" class="btn">🔄 Modo Migración</button>
+            <button onclick="copyNavigationMap()" class="btn" style="margin-top: 10px;">🗺️ Mapa del proyecto</button>
+    <p>🤖 <strong>Framework detectado:</strong> {{ framework }}</p>
+    <p>📝 <strong>Lenguaje:</strong> {{ language }}</p>
+            
         </div>
         
         <div class="link-box">
             🔗 Enlace: <code>{{ request.build_absolute_uri }}</code>
             <button onclick="copyLink()">📋 Copiar</button>
+            
         </div>
         
         <div class="file-list">
@@ -151,6 +155,66 @@
             navigator.clipboard.writeText(window.location.href);
             alert('✅ Enlace copiado al portapapeles');
         }
+
+        function copyNavigationMap() {
+    const rawUrl = window.location.origin + "/p/raw/{{ project.slug }}/";
+    const prompt = `🗺️ MAPA DE NAVEGACIÓN
+
+Actúa como un tutor de programación. Explica la estructura de este proyecto a un principiante.
+
+Proyecto: ${rawUrl}
+
+Por favor:
+1. Dime qué tecnología/framework detectas
+2. Explícame para qué sirve cada carpeta importante
+3. Señálame el archivo más importante y qué hace
+4. Dame una visión general de cómo está organizado
+
+Quiero entender la estructura, no solo copiar código.`;
+    
+    navigator.clipboard.writeText(prompt);
+    alert('✅ Mapa de navegación copiado');
+}
+
+function copyMigrationPrompt() {
+    const rawUrl = window.location.origin + "/p/raw/{{ project.slug }}/";
+    const prompt = `🔄 MODO MIGRACIÓN
+
+Tengo código en HTML/JS puro y quiero migrarlo a un framework moderno.
+
+Proyecto original: ${rawUrl}
+
+Por favor:
+1. Analiza mi código actual
+2. Sugiéreme qué framework usar (Django, Flutter, React)
+3. Explícame cómo mapear mi código al nuevo framework
+4. Dame ejemplos concretos de conversión
+
+No asumas que sé el framework. Explica como para principiante.`;
+    
+    navigator.clipboard.writeText(prompt);
+    alert('✅ Prompt de migración copiado');
+}
+
+function copyNavigationMap() {
+    const rawUrl = window.location.origin + "/p/raw/{{ project.slug }}/";
+    const prompt = `🗺️ MAPA DE NAVEGACIÓN
+
+Actúa como un tutor de programación. Explica la estructura de este proyecto a un principiante.
+
+Proyecto: ${rawUrl}
+
+Por favor:
+1. Dime qué tecnología/framework detectas
+2. Explícame para qué sirve cada carpeta importante
+3. Señálame el archivo más importante y qué hace
+4. Dame una visión general de cómo está organizado
+
+Quiero entender la estructura, no solo copiar código.`;
+    
+    navigator.clipboard.writeText(prompt);
+    alert('✅ Mapa de navegación copiado');
+}
     </script>
 </body>
 </html>

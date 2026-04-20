@@ -18,6 +18,9 @@ def project_view(request, slug):
     project = get_object_or_404(Project, slug=slug)
     files = project.files.all()
     
+    # Detectar framework y lenguaje
+    framework, language = detect_framework_and_language(files)
+    
     # Verificar expiración
     if project.is_expired():
         return render(request, 'core/expired.html', {'project': project})
@@ -29,9 +32,14 @@ def project_view(request, slug):
     # Modo IA (texto plano para que la IA lea)
     if request.GET.get('mode') == 'ia' or request.GET.get('mode') == 'text':
         response = HttpResponse(content_type='text/plain; charset=utf-8')
-        response.write(f"# PROYECTO: {project.title or project.slug}\n")
-        response.write(f"# ARCHIVOS: {files.count()}\n")
-        response.write(f"# VISTAS: {project.views}\n")
+        
+        # Información del proyecto
+        response.write("=" * 60 + "\n")
+        response.write("INFORMACIÓN DEL PROYECTO\n")
+        response.write("=" * 60 + "\n")
+        response.write(f"Framework detectado: {framework}\n")
+        response.write(f"Lenguaje: {language}\n")
+        response.write(f"Archivos totales: {files.count()}\n")
         response.write("=" * 60 + "\n\n")
         
         for file in files:
@@ -40,9 +48,10 @@ def project_view(request, slug):
             response.write("-" * 40 + "\n")
             
             try:
-                # Intentar leer el archivo como texto
                 with open(file.file.path, 'r', encoding='utf-8') as f:
                     content = f.read()
+                    if len(content) > 5000:
+                        content = content[:5000] + "\n... [CONTENIDO TRUNCADO]"
                     response.write(content)
             except (UnicodeDecodeError, FileNotFoundError, OSError):
                 response.write("[ARCHIVO BINARIO - No se puede mostrar en texto plano]")
@@ -55,6 +64,8 @@ def project_view(request, slug):
         return JsonResponse({
             'slug': project.slug,
             'title': project.title,
+            'framework': framework,
+            'language': language,
             'files': [{
                 'name': f.original_name,
                 'size': f.size,
@@ -62,11 +73,13 @@ def project_view(request, slug):
             } for f in files]
         })
     
-    # Modo humano
+    # Modo humano (vista normal)
     return render(request, 'core/project.html', {
         'project': project,
         'files': files,
-        'total_size': sum(f.size for f in files)
+        'total_size': sum(f.size for f in files),
+        'framework': framework,
+        'language': language,
     })
 
 
@@ -354,3 +367,45 @@ def download_for_ia(request, slug):
         response.write("\n\n" + "=" * 60 + "\n\n")
     
     return response
+
+def detect_framework_and_language(files):
+    """Detecta el framework y lenguaje basado en los archivos del proyecto"""
+    file_names = [f.original_name for f in files]
+    file_names_lower = [f.lower() for f in file_names]
+    
+    # Django
+    if 'manage.py' in file_names or 'settings.py' in file_names:
+        return 'Django', 'Python'
+    
+    # Flask
+    if 'app.py' in file_names or 'requirements.txt' in file_names:
+        if any('flask' in f.lower() for f in file_names):
+            return 'Flask', 'Python'
+    
+    # React
+    if 'package.json' in file_names:
+        if any('react' in f.lower() for f in file_names):
+            return 'React', 'JavaScript/JSX'
+        return 'Node.js', 'JavaScript'
+    
+    # Angular
+    if 'angular.json' in file_names:
+        return 'Angular', 'TypeScript'
+    
+    # Flutter
+    if 'pubspec.yaml' in file_names:
+        return 'Flutter', 'Dart'
+    
+    # Spring Boot
+    if 'pom.xml' in file_names:
+        return 'Spring Boot', 'Java'
+    
+    # HTML/CSS/JS puro
+    if any(f.endswith('.html') for f in file_names):
+        return 'HTML/CSS/JS', 'HTML/CSS/JavaScript'
+    
+    # Python puro
+    if any(f.endswith('.py') for f in file_names):
+        return 'Python', 'Python'
+    
+    return 'Desconocido', 'Desconocido'
