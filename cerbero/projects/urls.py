@@ -11,5 +11,6 @@ urlpatterns = [
     path('api/my-projects/', views.my_projects, name='my-projects'),
     path('api/upload-folder/', views.upload_folder, name='upload-folder'),
     path('api/upload-zip/', views.upload_zip, name='upload-zip'),
+    path('download/<str:slug>/', views.download_for_ia, name='download-for-ia'),
     
 ]

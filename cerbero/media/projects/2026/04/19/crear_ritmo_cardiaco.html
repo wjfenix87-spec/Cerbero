@@ -1,0 +1,52 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Crear Ritmo Cardíaco</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Crear Ritmo Cardíaco</h1>
+        <form method="post" action="{% url 'crear_ritmo_cardiaco' signos_vitales_id %}">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="tipo_ritmo" class="form-label">Tipo de Ritmo Cardíaco:</label>
+                <select class="form-select" id="tipo_ritmo" name="tipo_ritmo" required>
+                    <option value="">Seleccione...</option>
+                    <option value="Normal">Normal (60-100 lpm)</option>
+                    <option value="Bradicardia">Bradicardia (&lt; 60 lpm)</option>
+                    <option value="Taquicardia">Taquicardia (&gt; 100 lpm)</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="frecuencia" class="form-label">Frecuencia (lpm):</label>
+                <input type="number" class="form-control" id="frecuencia" name="frecuencia" min="1" required>
+            </div>
+            <div class="mb-3">
+                <label for="descripcion" class="form-label">Descripción:</label>
+                <textarea class="form-control" id="descripcion" name="descripcion" rows="2"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Crear Ritmo Cardíaco</button>
+        </form>
+        <div class="mt-4">
+            <h5>Clasificación de Ritmos Cardíacos</h5>
+            <table class="table table-dark table-striped">
+                <thead>
+                    <tr><th>Ritmo</th><th>Frecuencia</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Normal</td><td>60 – 100 lpm</td></tr>
+                    <tr><td>Bradicardia</td><td>&lt; 60 lpm</td></tr>
+                    <tr><td>Taquicardia</td><td>&gt; 100 lpm</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="{% static 'js/scripts.js' %}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

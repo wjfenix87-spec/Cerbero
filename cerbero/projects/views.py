@@ -324,3 +324,33 @@ def get_user_from_request(request):
         except Exception:
             pass
     return None
+
+def download_for_ia(request, slug):
+    """Descargar todo el código del proyecto en un archivo de texto para IAs"""
+    project = get_object_or_404(Project, slug=slug)
+    files = project.files.all()
+    
+    response = HttpResponse(content_type='text/plain')
+    response['Content-Disposition'] = f'attachment; filename="{slug}_proyecto.txt"'
+    
+    response.write(f"PROYECTO: {project.slug}\n")
+    response.write(f"ARCHIVOS: {files.count()}\n")
+    response.write("=" * 60 + "\n\n")
+    
+    for file in files:
+        response.write(f"=== {file.original_name} ===\n")
+        response.write(f"Tamaño: {file.size} bytes\n")
+        response.write("-" * 40 + "\n")
+        
+        try:
+            with open(file.file.path, 'r', encoding='utf-8') as f:
+                content = f.read()
+                # Limitar a 5000 caracteres por archivo
+                if len(content) > 5000:
+                    content = content[:5000] + "\n... [CONTENIDO TRUNCADO]"
+                response.write(content)
+        except (UnicodeDecodeError, FileNotFoundError, OSError):
+            response.write("[ARCHIVO BINARIO - No se puede mostrar en texto plano]")
+        response.write("\n\n" + "=" * 60 + "\n\n")
+    
+    return response

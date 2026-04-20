@@ -1,0 +1,88 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Detalle de Monitorización</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <h2>Detalle de Monitorización</h2>
+        <!-- ECG animado y sonido -->
+        <div class="mb-4">
+            <h5>ECG / Ritmo cardíaco</h5>
+            <canvas id="ecgChart" width="400" height="60"></canvas>
+            <audio id="ecgSound" src="{% static 'pacientes/sonidos/ecg.mp3' %}"></audio>
+            <button onclick="startECG()" class="btn btn-success btn-sm">Comience</button>
+            <button onclick="stopECG()" class="btn btn-danger btn-sm">Detener</button>
+            <span style="border:1px solid #888; padding:2px 6px; margin-left:10px;">{{ monitorizacion.frecuencia_cardiaca|default:monitorizacion.signos_vitales.frecuencia_cardiaca }}</span> LPM
+        </div>
+        <ul>
+            <li>Frecuencia cardíaca: {{ monitorizacion.signos_vitales.frecuencia_cardiaca }}</li>
+            <li>Frecuencia respiratoria: {{ monitorizacion.signos_vitales.frecuencia_respiratoria }}</li>
+            <li>SpO2: {{ monitorizacion.signos_vitales.spo2 }}</li>
+            <li>PAS: {{ monitorizacion.signos_vitales.presion_arterial_sistolica }}</li>
+            <li>Temperatura: {{ monitorizacion.signos_vitales.temperatura }}</li>
+            <li>Tipo de ritmo: {{ monitorizacion.ritmo_cardiaco.tipo_ritmo }}</li>
+        </ul>
+        <h4>Alarmas</h4>
+        <ul>
+            <li>Frecuencia cardíaca: {{ alarmas.frecuencia_cardiaca }}</li>
+            <li>Frecuencia respiratoria: {{ alarmas.frecuencia_respiratoria }}</li>
+            <li>SpO2: {{ alarmas.spo2 }}</li>
+            <li>PAS: {{ alarmas.presion_arterial_sistolica }}</li>
+            <li>Temperatura: {{ alarmas.temperatura }}</li>
+        </ul>
+        <a href="{% url 'lista_monitorizaciones' %}" class="btn btn-secondary mt-3">Regresar</a>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+    let ecgInterval;
+    function startECG() {
+      document.getElementById('ecgSound').play();
+      animateECG();
+    }
+    function stopECG() {
+      document.getElementById('ecgSound').pause();
+      document.getElementById('ecgSound').currentTime = 0;
+      clearInterval(ecgInterval);
+      // Reiniciar la gráfica
+      ecgChart.data.datasets[0].data = Array(40).fill(0);
+      ecgChart.update();
+    }
+    const ctx = document.getElementById('ecgChart').getContext('2d');
+    const ecgChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: Array(40).fill(''),
+        datasets: [{
+          label: 'ECG',
+          data: Array(40).fill(0),
+          borderColor: 'red',
+          borderWidth: 2,
+          fill: false,
+          pointRadius: 0
+        }]
+      },
+      options: {
+        animation: false,
+        scales: { y: { min: -2, max: 2 } },
+        plugins: { legend: { display: false } }
+      }
+    });
+    function animateECG() {
+      let t = 0;
+      ecgInterval = setInterval(() => {
+        t += 0.1;
+        let data = [];
+        for (let i = 0; i < 40; i++) {
+          data.push(Math.sin(t + i * 0.2));
+        }
+        ecgChart.data.datasets[0].data = data;
+        ecgChart.update();
+      }, 100);
+    }
+    </script>
+</body>
+</html>
