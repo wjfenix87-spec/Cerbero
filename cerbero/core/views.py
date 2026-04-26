@@ -5,8 +5,22 @@ from rest_framework.response import Response
 
 
 def home(request):
-    """Vista principal - Devuelve el HTML"""
+    """Vista principal - Redirige según estado de sesión"""
     return render(request, 'core/home.html')
+
+def index(request):
+    """Vista index - Página de origen (landing para nuevos usuarios)"""
+    return render(request, 'core/index.html')
+
+def sesion(request):
+    """Vista sesion - Página de login"""
+    return render(request, 'core/sesion.html')
+
+def landing(request):
+    """Vista landing - Decide si mostrar index o redirigir a home"""
+    # Si el usuario tiene sesión activa, ir directo al home
+    # Esta lógica se maneja en JavaScript del template
+    return render(request, 'core/index.html')
 
 @api_view(['GET'])
 def health_check(request):

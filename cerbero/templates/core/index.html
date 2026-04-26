@@ -324,7 +324,18 @@
   </section>
 
   <script>
+    // Auto-redirect si ya hay sesión activa
     (function() {
+      var session = localStorage.getItem('cerbero_session');
+      var token = localStorage.getItem('accessToken');
+      
+      if (session && token) {
+        // Usuario ya tiene sesión, redirigir al home
+        window.location.href = "{% url 'home' %}";
+        return;
+      }
+      
+      // Si no hay sesión, mostrar index normalmente
       var c = document.getElementById('particles');
       var cols = ['#ff4422', '#ff8844', '#00ff88', '#ffffff'];
       for (var i = 0; i < 25; i++) {

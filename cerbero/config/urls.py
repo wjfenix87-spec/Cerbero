@@ -6,7 +6,10 @@ from core import views as core_views
 from django.views.generic import TemplateView
 
 urlpatterns = [
-    path('', core_views.home, name='home'),
+    path('', core_views.landing, name='landing'),  # Página de entrada (decide index o home)
+    path('home/', core_views.home, name='home'),   # Home principal (usuarios registrados)
+    path('index/', core_views.index, name='index'),
+    path('sesion/', core_views.sesion, name='sesion'),
     path('admin/', admin.site.urls),
     path('p/', include('projects.urls')),  # 👈 AGREGAR
     path('terms/', TemplateView.as_view(template_name='core/terms.html'), name='terms'),

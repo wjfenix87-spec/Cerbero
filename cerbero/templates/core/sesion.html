@@ -706,6 +706,16 @@
          window.location.href = "{% url 'home' %}";
          return;
       }
+      
+      // Check URL parameter for mode (login or register)
+      var urlParams = new URLSearchParams(window.location.search);
+      var mode = urlParams.get('mode');
+      
+      if (mode === 'register') {
+        goTo('viewRegister');
+        return;
+      }
+      
       var saved = getSavedCredentials();
       if (saved) {
         document.getElementById('loginUser').value = saved.user;
