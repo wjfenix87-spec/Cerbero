@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -305,7 +306,8 @@
 
     <header class="header" id="header">
         <a href="/" class="logo-cyber" style="text-decoration: none; display: flex; align-items: center; gap: 10px;">
-            <div class="logo-glitch">🐕 CERBERO</div>
+            <img src="{% static 'assets/2.png' %}" alt="CERBERO" style="height: 40px; width: auto;">
+            <div class="logo-glitch">CERBERO</div>
             <span class="logo-tag">v3.0</span>
         </a>
         <nav class="nav-cyber">
@@ -324,7 +326,7 @@
                 <a href="{% url 'sesion' %}" class="btn-cyber btn-cyber-fill" style="text-decoration: none; display: inline-block;">INGRESAR</a>
             </div>
             <div id="userInfo" style="display: none;" class="user-info">
-                <div class="user-avatar">🐕</div>
+                <img src="{% static 'assets/2.png' %}" alt="User" class="user-avatar" style="height: 35px; width: auto; border-radius: 50%;">
                 <span class="username" id="usernameDisplay"></span>
                 <span class="logout-btn" onclick="handleLogout()">🚪</span>
             </div>
@@ -493,7 +495,7 @@
     </section>
 
     <div class="quote-wow">
-        <div class="quote-header"><span class="quote-icon">🐕></span><span class="quote-author">Cerbero, el guardián</span></div>
+        <div class="quote-header"><span class="quote-icon"><img src="{% static 'assets/2.png' %}" alt="CERBERO" style="height: 16px; width: auto; vertical-align: middle;"></span><span class="quote-author">Cerbero, el guardián</span></div>
         <div class="quote-text">"Las IAs no pueden acceder a tu PC por <span class="quote-highlight">políticas de privacidad</span>...<br>pero Cerbero <span class="quote-highlight">les pasa el mensaje</span>. Tú solo comparte el enlace único."</div>
     </div>
 
@@ -505,7 +507,7 @@
 
     <footer class="footer-cyber">
         <div class="footer-grid">
-            <div class="footer-brand"><div class="logo-glitch" style="font-size: 1.5rem;">🐕 CERBERO</div><p>El guardián del contexto digital. Rompiendo barreras entre tu código y las IAs desde 2026.</p></div>
+            <div class="footer-brand"><div class="logo-glitch" style="font-size: 1.5rem; display: flex; align-items: center; gap: 8px;"><img src="{% static 'assets/2.png' %}" alt="CERBERO" style="height: 30px; width: auto;"> CERBERO</div><p>El guardián del contexto digital. Rompiendo barreras entre tu código y las IAs desde 2026.</p></div>
             <div class="footer-links"><h4>Recursos</h4><ul><li><a href="#">Documentación</a></li><li><a href="#">Soporte</a></li></ul></div>
             <div class="footer-links"><h4>Legal</h4><ul><li><a href="/privacy/">Privacidad</a></li><li><a href="/terms/">Términos</a></li><li><a href="/cookies/">Cookies</a></li></ul></div>
         </div>

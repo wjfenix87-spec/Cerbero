@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -28,6 +29,7 @@
             margin-bottom: 30px;
             background: linear-gradient(135deg, #00f3ff, #b026ff);
             -webkit-background-clip: text;
+            background-clip: text;
             -webkit-text-fill-color: transparent;
         }
         h2 {
@@ -61,7 +63,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>🐕 Términos y Condiciones</h1>
+        <h1><img src="{% static 'assets/2.png' %}" alt="CERBERO" style="height: 35px; width: auto; vertical-align: middle; margin-right: 10px;"> Términos y Condiciones</h1>
         <p><strong>Última actualización:</strong> Marzo 2026</p>
         
         <h2>1. Aceptación de los términos</h2>
@@ -84,7 +86,7 @@
         
         <h2>4. Cerbero NO se responsabiliza</h2>
         <div class="warning">
-            <strong>🐕 Cerbero NO se hace responsable por:</strong><br><br>
+            <strong><img src="{% static 'assets/2.png' %}" alt="CERBERO" style="height: 18px; width: auto; vertical-align: middle; margin-right: 6px;"> Cerbero NO se hace responsable por:</strong><br><br>
             • Proyectos copiados, compartidos o redistribuidos sin autorización<br>
             • Uso indebido de los enlaces generados<br>
             • Pérdida de datos por expiración de enlaces<br>

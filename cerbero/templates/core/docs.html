@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -28,6 +29,7 @@
             margin-bottom: 30px;
             background: linear-gradient(135deg, #00f3ff, #b026ff);
             -webkit-background-clip: text;
+            background-clip: text;
             -webkit-text-fill-color: transparent;
         }
         h2 {
@@ -101,7 +103,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>🐕 Documentación de Cerbero</h1>
+        <h1><img src="{% static 'assets/2.png' %}" alt="CERBERO" style="height: 35px; width: auto; vertical-align: middle; margin-right: 10px;"> Documentación de Cerbero</h1>
         <p><strong>El guardián del contexto digital</strong></p>
 
         <h2>📖 ¿Qué es Cerbero?</h2>
@@ -185,7 +187,7 @@ Necesito mejorar el rendimiento y agregar nuevas funciones.</pre>
             </tbody>
         </table>
 
-        <h2>🐕 Enlaces útiles</h2>
+        <h2><img src="{% static 'assets/2.png' %}" alt="CERBERO" style="height: 24px; width: auto; vertical-align: middle; margin-right: 8px;"> Enlaces útiles</h2>
         <ul>
             <li><a href="/" style="color: #00f3ff;">🏠 Volver a Cerbero</a></li>
             <li><a href="/terms/" style="color: #00f3ff;">📜 Términos y Condiciones</a></li>
