@@ -388,110 +388,100 @@
         </div>
     </section>
 
-    <section class="demo-cyber" id="demo">
-        <div class="demo-container-cyber">
-            <div class="demo-grid-cyber">
-                <div class="demo-text-cyber">
-                    <span class="section-tag-cyber">:: PROTOCOLO ::</span>
-                    <h3>Sube. Comparte. Resuelve.<br>En ese orden.</h3>
-                    <p>Cerbero actúa como el puente cuántico entre tu entorno local y las IAs más potentes del planeta. Tu código nunca toca servidores permanentes: existe solo como contexto temporal.</p>
-                    <div class="steps-cyber">
-                        <div class="step-cyber"><div class="step-num-cyber">1</div><div class="step-content-cyber"><h4>Arrastra o selecciona</h4><p>Tus archivos, carpetas, o proyectos completos</p></div></div>
-                        <div class="step-cyber"><div class="step-num-cyber">2</div><div class="step-content-cyber"><h4>Encriptación automática</h4><p>Cerbero procesa y genera un hash único seguro</p></div></div>
-                        <div class="step-cyber"><div class="step-num-cyber">3</div><div class="step-content-cyber"><h4>Comparte con cualquier IA</h4><p>ChatGPT, Claude, Gemini, Copilot... todas entienden</p></div></div>
-                    </div>
-                </div>
-              <div class="upload-zone-cyber" id="uploadZone" style="cursor: pointer;">
-    <div class="upload-content">
-        <div class="upload-icon-cyber">📁</div>
-        <h4 style="font-family: 'Space Grotesk', sans-serif; font-size: 1.5rem; margin-bottom: 15px;">ZONA DE TRANSFERENCIA</h4>
-        <p style="color: rgba(255,255,255,0.5); margin-bottom: 25px;">
-            📁 Arrastra una CARPETA (proyectos pequeños)<br>
-            📦 Arrastra un ZIP (proyectos grandes)
-        </p>
-        
-        <div style="display: flex; gap: 15px; justify-content: center; margin-bottom: 20px;">
-            <button id="uploadFolderBtn" class="btn-cyber btn-cyber-outline" style="padding: 10px 20px;">📁 Subir Carpeta</button>
-            <button id="uploadZipBtn" class="btn-cyber btn-cyber-outline" style="padding: 10px 20px;">📦 Subir ZIP</button>
-        </div>
-        
-        <div id="uploadStatus" style="margin-top: 15px; color: var(--neon-green);"></div>
-        
-        <!-- 👇 SELECTOR DE EXPIRACIÓN (AHORA NO DISPARA SUBIDA) -->
-        <div class="expiration-selector" style="margin: 20px 0; padding: 10px; border-top: 1px solid rgba(0, 243, 255, 0.2); cursor: default;">
-            <label style="color: var(--neon-blue); font-family: monospace;">⏱️ EXPIRACIÓN:</label>
-            <select id="expirationSelect" style="background: var(--dark-3); border: 1px solid rgba(0,243,255,0.3); color: #fff; padding: 8px 12px; border-radius: 6px; margin-left: 10px; cursor: pointer;">
-                <option value="">Nunca expira</option>
-                <option value="24">24 horas</option>
-                <option value="168">7 días</option>
-                <option value="720">30 días</option>
-            </select>
-        </div>
-    </div>
-
-    <!-- SECCIÓN NUEVA: GUÍA DE FRAMEWORKS -->
-<div class="frameworks-guide" style="background: #0a0a0f; border-radius: 12px; padding: 20px; margin-top: 30px; border: 1px solid #00f3ff;">
-    <h3 style="color: #00f3ff; margin-bottom: 15px;">🎓 ¿Qué necesitas saber? Cerbero te guía</h3>
-    <p style="color: #888; margin-bottom: 20px;">Selecciona tu framework y te diremos exactamente qué archivos subir para que la IA te ayude.</p>
-    
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 20px;">
-    <a href="/upload-guide/django/" class="btn-cyber btn-cyber-outline" style="text-align: center; text-decoration: none;">🐍 Django</a>
-    <a href="/upload-guide/flutter/" class="btn-cyber btn-cyber-outline" style="text-align: center; text-decoration: none;">📱 Flutter</a>
-    <a href="/upload-guide/react/" class="btn-cyber btn-cyber-outline" style="text-align: center; text-decoration: none;">⚛️ React</a>
-    <a href="/upload-guide/angular/" class="btn-cyber btn-cyber-outline" style="text-align: center; text-decoration: none;">🅰️ Angular</a>
-    <a href="/upload-guide/vue/" class="btn-cyber btn-cyber-outline" style="text-align: center; text-decoration: none;">💚 Vue.js</a>
-    <a href="/upload-guide/node/" class="btn-cyber btn-cyber-outline" style="text-align: center; text-decoration: none;">🟢 Node.js</a>
-    <a href="/upload-guide/spring/" class="btn-cyber btn-cyber-outline" style="text-align: center; text-decoration: none;">🍃 Spring Boot</a>
-    <a href="/upload-guide/laravel/" class="btn-cyber btn-cyber-outline" style="text-align: center; text-decoration: none;">🔴 Laravel</a>
-    <a href="/upload-guide/html/" class="btn-cyber btn-cyber-outline" style="text-align: center; text-decoration: none;">📄 HTML/CSS/JS</a>
-</div>
-    
-    <div id="frameworkGuideContent" style="background: #12121a; border-radius: 10px; padding: 20px; display: none;">
-        <!-- Aquí se muestra la guía dinámica -->
-    </div>
-</div>
-
-<!-- SECCIÓN NUEVA: SELECCIONAR LENGUAJE -->
-<div class="language-selector" style="background: #0a0a0f; border-radius: 12px; padding: 20px; margin-top: 20px; border: 1px solid #00f3ff;">
-    <h3 style="color: #00f3ff; margin-bottom: 15px;">📝 ¿En qué lenguaje está tu proyecto?</h3>
-    <p style="color: #888; margin-bottom: 20px;">Selecciona el lenguaje para que la IA sepa en qué enfocarse.</p>
-    
-    
-    
-    <div id="selectedLanguage" style="margin-top: 15px; padding: 10px; background: #12121a; border-radius: 8px; display: none;">
-        <span style="color: #00ff9d;">✅ Lenguaje seleccionado:</span> <span id="langDisplay"></span>
-        <button onclick="copyLanguagePrompt()" class="btn-cyber btn-cyber-outline" style="margin-left: 15px; padding: 5px 12px;">📋 Copiar para IA</button>
-    </div>
-</div>
-
-<!-- Contenedor de guía dinámica (se muestra al hacer clic en framework) -->
-<div id="dynamicGuide" style="display: none; background: #0a0a0f; border-radius: 12px; padding: 25px; margin-top: 30px; border: 1px solid #00ff9d;">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-        <h3 id="guideTitle" style="color: #00ff9d;">📁 Guía para <span id="frameworkName"></span></h3>
-        <button onclick="closeGuide()" style="background: transparent; border: none; color: #ff4444; font-size: 1.5rem; cursor: pointer;">✕</button>
-    </div>
-    
-    <div id="guideContent"></div>
-    
-    <div style="margin-top: 20px; text-align: center;">
-        <button id="guideUploadBtn" class="btn-cyber btn-cyber-fill" style="background: linear-gradient(135deg, #00ff9d, #00b894);">📁 Subir estos archivos</button>
-    </div>
-</div>
-
-    <!-- Historial de proyectos recientes -->
-<div class="recent-projects" style="background: #0a0a0f; border-radius: 12px; padding: 20px; margin-top: 30px; border: 1px solid #00f3ff;">
-    <h3 style="color: #00f3ff; margin-bottom: 15px;">📜 Proyectos recientes</h3>
-    <div id="recentProjectsList" style="display: flex; flex-direction: column; gap: 10px;">
-        <p style="color: #888; text-align: center;">No has visitado ningún proyecto aún.</p>
-    </div>
-    <button onclick="clearRecentProjects()" class="btn-cyber btn-cyber-outline" style="margin-top: 15px; padding: 8px 16px;">🗑️ Limpiar historial</button>
-</div>
-
-    </div>
-</div>
+   <section class="demo-cyber" id="demo">
+    <div class="demo-container-cyber">
+        <!-- PROTOCOLO ARRIBA (FULL WIDTH) -->
+        <div style="text-align: center; margin-bottom: 60px;">
+            <span class="section-tag-cyber">:: PROTOCOLO ::</span>
+            <h3 style="font-family: 'Space Grotesk', sans-serif; font-size: 2rem; margin: 20px 0;">Sube. Comparte. Resuelve.<br>En ese orden.</h3>
+            <p style="color: rgba(255,255,255,0.6); max-width: 700px; margin: 0 auto 30px;">Cerbero actúa como el puente cuántico entre tu entorno local y las IAs más potentes del planeta. Tu código nunca toca servidores permanentes: existe solo como contexto temporal.</p>
+            <div style="display: flex; justify-content: center; gap: 50px; flex-wrap: wrap;">
+                <div><strong style="color: #00f3ff; font-size: 1.5rem;">1️⃣</strong><br>Arrastra o selecciona</div>
+                <div><strong style="color: #00f3ff; font-size: 1.5rem;">2️⃣</strong><br>Encriptación automática</div>
+                <div><strong style="color: #00f3ff; font-size: 1.5rem;">3️⃣</strong><br>Comparte con cualquier IA</div>
             </div>
         </div>
-    </section>
+
+        <!-- ZONA DE TRANSFERENCIA HORIZONTAL (ABAJO) -->
+        <div class="upload-zone-cyber" id="uploadZone" style="cursor: pointer; padding: 25px 30px;">
+            <!-- Cabecera -->
+            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid rgba(0, 243, 255, 0.2);">
+                <span style="font-size: 28px;">📦</span>
+                <span style="font-family: 'Space Grotesk', monospace; font-size: 18px; font-weight: 700; background: linear-gradient(135deg, #00f3ff, #b026ff); -webkit-background-clip: text; background-clip: text; color: transparent;">ZONA DE TRANSFERENCIA</span>
+                <span style="font-size: 10px; background: rgba(0,243,255,0.15); border: 1px solid rgba(0,243,255,0.3); padding: 2px 10px; border-radius: 20px; color: #00f3ff;">TEMPORAL</span>
+            </div>
+
+            <!-- Fila horizontal: arrastre + botones + expiración -->
+            <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap; margin-bottom: 30px;">
+                <div style="flex: 2; min-width: 200px; background: rgba(0,0,0,0.3); border: 2px dashed rgba(0,243,255,0.4); border-radius: 14px; padding: 14px 20px; text-align: center;">
+                    <div style="font-size: 28px;">📁 📂 🗂️</div>
+                    <p style="font-size: 13px; font-weight: 600; margin: 0;">Arrastra CARPETA o ZIP</p>
+                    <small style="font-size: 10px; opacity: 0.6;">Proyectos pequeños / grandes</small>
+                </div>
+                <div style="display: flex; gap: 12px;">
+                    <button id="uploadFolderBtn" style="background: rgba(255,255,255,0.05); color: #e0e0e0; border: 1px solid rgba(255,255,255,0.15); padding: 12px 22px; border-radius: 10px; cursor: pointer;">📁 Subir Carpeta</button>
+                    <button id="uploadZipBtn" style="background: linear-gradient(135deg, #00f3ff, #b026ff); color: #fff; border: none; padding: 12px 22px; border-radius: 10px; cursor: pointer;">📦 Subir ZIP</button>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px; background: rgba(0,0,0,0.3); padding: 8px 16px; border-radius: 40px;">
+                    <span>⏱️</span>
+                    <select id="expirationSelect" style="background: #12121a; border: 1px solid rgba(0,243,255,0.3); color: #fff; padding: 6px 10px; border-radius: 20px; cursor: pointer;">
+                        <option value="">Nunca</option>
+                        <option value="24">24h</option>
+                        <option value="168">7d</option>
+                        <option value="720">30d</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Estado de subida -->
+            <div id="uploadStatus" style="margin-bottom: 25px; text-align: center; color: #00ff9d; font-family: monospace;"></div>
+
+            <!-- FRAMEWORKS + LENGUAJE + HISTORIAL (3 COLUMNAS HORIZONTALES) -->
+            <div style="display: flex; gap: 25px; flex-wrap: wrap; justify-content: space-between; border-top: 1px solid rgba(0,243,255,0.1); padding-top: 25px;">
+                
+                <!-- Frameworks -->
+                <div style="flex: 2; min-width: 250px;">
+                    <h4 style="margin: 0 0 12px 0; color: #00f3ff;">🎓 ¿Qué necesitas saber? Cerbero te guía</h4>
+                    <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                        <a href="/upload-guide/django/" class="btn-cyber btn-cyber-outline" style="padding: 6px 14px; font-size: 12px; text-decoration: none;">🐍 Django</a>
+                        <a href="/upload-guide/flutter/" class="btn-cyber btn-cyber-outline" style="padding: 6px 14px; font-size: 12px; text-decoration: none;">📱 Flutter</a>
+                        <a href="/upload-guide/react/" class="btn-cyber btn-cyber-outline" style="padding: 6px 14px; font-size: 12px; text-decoration: none;">⚛️ React</a>
+                        <a href="/upload-guide/angular/" class="btn-cyber btn-cyber-outline" style="padding: 6px 14px; font-size: 12px; text-decoration: none;">🅰️ Angular</a>
+                        <a href="/upload-guide/vue/" class="btn-cyber btn-cyber-outline" style="padding: 6px 14px; font-size: 12px; text-decoration: none;">💚 Vue.js</a>
+                        <a href="/upload-guide/node/" class="btn-cyber btn-cyber-outline" style="padding: 6px 14px; font-size: 12px; text-decoration: none;">🟢 Node.js</a>
+                        <a href="/upload-guide/spring/" class="btn-cyber btn-cyber-outline" style="padding: 6px 14px; font-size: 12px; text-decoration: none;">🍃 Spring Boot</a>
+                        <a href="/upload-guide/laravel/" class="btn-cyber btn-cyber-outline" style="padding: 6px 14px; font-size: 12px; text-decoration: none;">🔴 Laravel</a>
+                        <a href="/upload-guide/html/" class="btn-cyber btn-cyber-outline" style="padding: 6px 14px; font-size: 12px; text-decoration: none;">📄 HTML/CSS/JS</a>
+                    </div>
+                </div>
+
+                <!-- Lenguaje -->
+                <div style="flex: 1; min-width: 180px;">
+                    <h4 style="margin: 0 0 12px 0; color: #00ff9d;">📝 ¿En qué lenguaje está tu proyecto?</h4>
+                    <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                        <button onclick="selectLanguage('python')" class="lang-btn" style="background: #12121a; border: 1px solid #00f3ff; padding: 6px 12px; border-radius: 20px; cursor: pointer;">🐍 Python</button>
+                        <button onclick="selectLanguage('javascript')" class="lang-btn" style="background: #12121a; border: 1px solid #00f3ff; padding: 6px 12px; border-radius: 20px; cursor: pointer;">📜 JS</button>
+                        <button onclick="selectLanguage('java')" class="lang-btn" style="background: #12121a; border: 1px solid #00f3ff; padding: 6px 12px; border-radius: 20px; cursor: pointer;">☕ Java</button>
+                        <button onclick="selectLanguage('dart')" class="lang-btn" style="background: #12121a; border: 1px solid #00f3ff; padding: 6px 12px; border-radius: 20px; cursor: pointer;">🎯 Dart</button>
+                    </div>
+                    <div id="selectedLanguage" style="margin-top: 12px; display: none; padding: 8px; background: #0a0a0f; border-radius: 8px;">
+                        <span id="langDisplay"></span>
+                        <button onclick="copyLanguagePrompt()" style="margin-left: 10px; background: #00ff9d; border: none; padding: 4px 12px; border-radius: 6px; cursor: pointer;">📋 Copiar</button>
+                    </div>
+                </div>
+
+                <!-- Historial -->
+                <div style="flex: 1; min-width: 180px;">
+                    <h4 style="margin: 0 0 12px 0; color: #00f3ff;">📜 Proyectos recientes</h4>
+                    <div id="recentProjectsList" style="background: #0a0a0f; border-radius: 8px; padding: 8px; max-height: 150px; overflow-y: auto;">
+                        <p style="color: #888; text-align: center;">No has visitado ningún proyecto aún.</p>
+                    </div>
+                    <button onclick="clearRecentProjects()" style="margin-top: 10px; background: transparent; border: 1px solid #ff4444; color: #ff4444; padding: 4px 12px; border-radius: 6px; cursor: pointer;">🗑️ Limpiar historial</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section> 
 
     <section class="dashboard-section" id="dashboard">
         <div class="section-header-cyber">
@@ -785,8 +775,25 @@
         document.getElementById('ctaUploadBtn')?.addEventListener('click', triggerUpload);
         
         function init() {
-            if (accessToken) {
-                fetch('/api/auth/me/', { headers: { 'Authorization': `Bearer ${accessToken}` } }).then(r => r.json()).then(u => { if (u.id) { currentUser = u; updateUIAfterLogin(); loadUserProjects(); } }).catch(() => { localStorage.removeItem('accessToken'); localStorage.removeItem('refreshToken'); });
+            if (accessToken && accessToken !== 'null' && accessToken !== 'undefined') {
+                fetch('/api/auth/me/', { headers: { 'Authorization': `Bearer ${accessToken}` } })
+                .then(r => {
+                    if (!r.ok) throw new Error("Unauthorized");
+                    return r.json();
+                })
+                .then(u => { 
+                    if (u.id) { 
+                        currentUser = u; 
+                        updateUIAfterLogin(); 
+                        loadUserProjects(); 
+                    } 
+                })
+                .catch(() => { 
+                    localStorage.removeItem('accessToken'); 
+                    localStorage.removeItem('refreshToken'); 
+                    accessToken = null; 
+                    currentUser = null;
+                });
             }
             const featuresGrid = document.getElementById('featuresGrid');
             if (featuresGrid) {
