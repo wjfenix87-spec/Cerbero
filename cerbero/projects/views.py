@@ -2,15 +2,31 @@ from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
-from rest_framework.decorators import api_view, permission_classes
+from django.utils import timezone
+from rest_framework.decorators import api_view, permission_classes, throttle_classes
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.throttling import AnonRateThrottle
 from rest_framework.response import Response
 from .models import Project, ProjectFile
-from datetime import datetime, timedelta
+from datetime import timedelta
 import json
 import zipfile
 import tempfile
 import os
+import logging
+
+logger = logging.getLogger('projects')
+
+# File upload constants
+MAX_FILE_SIZE = 50 * 1024 * 1024  # 50MB per file
+MAX_FILES_PER_UPLOAD = 100  # Maximum files per upload
+ALLOWED_FILE_TYPES = [
+    'text/x-python', 'text/javascript', 'application/javascript',
+    'text/html', 'text/css', 'application/json', 'text/xml',
+    'application/xml', 'text/x-java', 'text/x-c', 'text/x-c++',
+    'text/x-php', 'text/x-ruby', 'text/x-go', 'text/x-rust',
+    'text/x-typescript', 'text/x-script.python',
+]
 
 
 def project_view(request, slug):
@@ -105,6 +121,7 @@ def get_project_info(request, slug):
 
 @csrf_exempt
 @require_http_methods(["POST"])
+@throttle_classes([AnonRateThrottle])
 def upload_file(request):
     """Endpoint para subir archivos"""
     try:
@@ -121,15 +138,29 @@ def upload_file(request):
             if expiration_hours:
                 try:
                     hours = int(expiration_hours)
-                    project.expires_at = datetime.now() + timedelta(hours=hours)
+                    project.expires_at = timezone.now() + timedelta(hours=hours)
                     project.save()
-                except:
-                    pass
+                except (ValueError, TypeError) as e:
+                    logger.warning(f"Invalid expiration value: {expiration_hours} - {e}")
         
         files = request.FILES.getlist('files')
+        
+        # Validate file count
+        if len(files) > MAX_FILES_PER_UPLOAD:
+            return JsonResponse({
+                'error': f'Demasiados archivos. Máximo permitido: {MAX_FILES_PER_UPLOAD}'
+            }, status=400)
+        
         uploaded_files = []
         
         for file in files:
+            # Validate file size
+            if file.size > MAX_FILE_SIZE:
+                logger.warning(f"File too large: {file.name} ({file.size} bytes)")
+                return JsonResponse({
+                    'error': f'Archivo demasiado grande: {file.name}. Máximo: {MAX_FILE_SIZE // (1024*1024)}MB'
+                }, status=400)
+            
             project_file = ProjectFile.objects.create(
                 project=project,
                 file=file,
@@ -154,13 +185,16 @@ def upload_file(request):
         })
         
     except Project.DoesNotExist:
+        logger.error(f"Project not found: {slug}")
         return JsonResponse({'error': 'Proyecto no encontrado'}, status=404)
     except Exception as e:
+        logger.error(f"Error uploading file: {e}", exc_info=True)
         return JsonResponse({'error': str(e)}, status=500)
 
 
 @csrf_exempt
 @require_http_methods(["POST"])
+@throttle_classes([AnonRateThrottle])
 def upload_folder(request):
     try:
         user = get_user_from_request(request)
@@ -234,10 +268,10 @@ def upload_folder(request):
         if expiration_hours:
             try:
                 hours = int(expiration_hours)
-                project.expires_at = datetime.now() + timedelta(hours=hours)
+                project.expires_at = timezone.now() + timedelta(hours=hours)
                 project.save()
-            except:
-                pass
+            except (ValueError, TypeError) as e:
+                logger.warning(f"Invalid expiration value: {expiration_hours} - {e}")
         
         # ===== GUARDAR ARCHIVOS IMPORTANTES =====
         for file in filtered_files[:5000]:  # Límite de seguridad
@@ -260,7 +294,7 @@ def upload_folder(request):
         })
         
     except Exception as e:
-        print(f"Error: {e}")
+        logger.error(f"Error uploading folder: {e}", exc_info=True)
         import traceback
         traceback.print_exc()
         return JsonResponse({'error': str(e)}, status=500)
@@ -268,6 +302,7 @@ def upload_folder(request):
 
 @csrf_exempt
 @require_http_methods(["POST"])
+@throttle_classes([AnonRateThrottle])
 def upload_zip(request):
     try:
         zip_file = request.FILES.get('zip_file')
@@ -282,10 +317,10 @@ def upload_zip(request):
         if expiration_hours:
             try:
                 hours = int(expiration_hours)
-                project.expires_at = datetime.now() + timedelta(hours=hours)
+                project.expires_at = timezone.now() + timedelta(hours=hours)
                 project.save()
-            except:
-                pass
+            except (ValueError, TypeError) as e:
+                logger.warning(f"Invalid expiration value: {expiration_hours} - {e}")
         
         # MISMAS LISTAS DE FILTRO
         IGNORE_FOLDERS = ['venv/', 'env/', '.venv/', '__pycache__/', '.git/', 'node_modules/', '.idea/', '.vscode/']
