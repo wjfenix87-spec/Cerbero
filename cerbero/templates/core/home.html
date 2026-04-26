@@ -285,6 +285,15 @@
             <input type="password" id="loginPassword" placeholder="CONTRASEÑA">
             <div id="loginError" class="error-message"></div>
             <button class="btn-cyber btn-cyber-fill" onclick="handleLogin()">INGRESAR</button>
+            <button onclick="location.href='/upload-guide/django/'" class="btn-cyber btn-cyber-outline">🐍 Django</button>
+<button onclick="location.href='/upload-guide/flutter/'" class="btn-cyber btn-cyber-outline">📱 Flutter</button>
+<button onclick="location.href='/upload-guide/react/'" class="btn-cyber btn-cyber-outline">⚛️ React</button>
+<button onclick="location.href='/upload-guide/angular/'" class="btn-cyber btn-cyber-outline">🅰️ Angular</button>
+<button onclick="location.href='/upload-guide/vue/'" class="btn-cyber btn-cyber-outline">💚 Vue.js</button>
+<button onclick="location.href='/upload-guide/node/'" class="btn-cyber btn-cyber-outline">🟢 Node.js</button>
+<button onclick="location.href='/upload-guide/spring/'" class="btn-cyber btn-cyber-outline">🍃 Spring Boot</button>
+<button onclick="location.href='/upload-guide/laravel/'" class="btn-cyber btn-cyber-outline">🔴 Laravel</button>
+<button onclick="location.href='/upload-guide/html/'" class="btn-cyber btn-cyber-outline">📄 HTML/CSS/JS</button>
             <div class="switch-mode" onclick="switchToRegister()">¿No tienes cuenta? Regístrate →</div>
         </div>
         <div id="registerForm" style="display: none;">
@@ -419,6 +428,65 @@
             </select>
         </div>
     </div>
+
+    <!-- SECCIÓN NUEVA: GUÍA DE FRAMEWORKS -->
+<div class="frameworks-guide" style="background: #0a0a0f; border-radius: 12px; padding: 20px; margin-top: 30px; border: 1px solid #00f3ff;">
+    <h3 style="color: #00f3ff; margin-bottom: 15px;">🎓 ¿Qué necesitas saber? Cerbero te guía</h3>
+    <p style="color: #888; margin-bottom: 20px;">Selecciona tu framework y te diremos exactamente qué archivos subir para que la IA te ayude.</p>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 20px;">
+    <a href="/upload-guide/django/" class="btn-cyber btn-cyber-outline" style="text-align: center; text-decoration: none;">🐍 Django</a>
+    <a href="/upload-guide/flutter/" class="btn-cyber btn-cyber-outline" style="text-align: center; text-decoration: none;">📱 Flutter</a>
+    <a href="/upload-guide/react/" class="btn-cyber btn-cyber-outline" style="text-align: center; text-decoration: none;">⚛️ React</a>
+    <a href="/upload-guide/angular/" class="btn-cyber btn-cyber-outline" style="text-align: center; text-decoration: none;">🅰️ Angular</a>
+    <a href="/upload-guide/vue/" class="btn-cyber btn-cyber-outline" style="text-align: center; text-decoration: none;">💚 Vue.js</a>
+    <a href="/upload-guide/node/" class="btn-cyber btn-cyber-outline" style="text-align: center; text-decoration: none;">🟢 Node.js</a>
+    <a href="/upload-guide/spring/" class="btn-cyber btn-cyber-outline" style="text-align: center; text-decoration: none;">🍃 Spring Boot</a>
+    <a href="/upload-guide/laravel/" class="btn-cyber btn-cyber-outline" style="text-align: center; text-decoration: none;">🔴 Laravel</a>
+    <a href="/upload-guide/html/" class="btn-cyber btn-cyber-outline" style="text-align: center; text-decoration: none;">📄 HTML/CSS/JS</a>
+</div>
+    
+    <div id="frameworkGuideContent" style="background: #12121a; border-radius: 10px; padding: 20px; display: none;">
+        <!-- Aquí se muestra la guía dinámica -->
+    </div>
+</div>
+
+<!-- SECCIÓN NUEVA: SELECCIONAR LENGUAJE -->
+<div class="language-selector" style="background: #0a0a0f; border-radius: 12px; padding: 20px; margin-top: 20px; border: 1px solid #00f3ff;">
+    <h3 style="color: #00f3ff; margin-bottom: 15px;">📝 ¿En qué lenguaje está tu proyecto?</h3>
+    <p style="color: #888; margin-bottom: 20px;">Selecciona el lenguaje para que la IA sepa en qué enfocarse.</p>
+    
+    
+    
+    <div id="selectedLanguage" style="margin-top: 15px; padding: 10px; background: #12121a; border-radius: 8px; display: none;">
+        <span style="color: #00ff9d;">✅ Lenguaje seleccionado:</span> <span id="langDisplay"></span>
+        <button onclick="copyLanguagePrompt()" class="btn-cyber btn-cyber-outline" style="margin-left: 15px; padding: 5px 12px;">📋 Copiar para IA</button>
+    </div>
+</div>
+
+<!-- Contenedor de guía dinámica (se muestra al hacer clic en framework) -->
+<div id="dynamicGuide" style="display: none; background: #0a0a0f; border-radius: 12px; padding: 25px; margin-top: 30px; border: 1px solid #00ff9d;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h3 id="guideTitle" style="color: #00ff9d;">📁 Guía para <span id="frameworkName"></span></h3>
+        <button onclick="closeGuide()" style="background: transparent; border: none; color: #ff4444; font-size: 1.5rem; cursor: pointer;">✕</button>
+    </div>
+    
+    <div id="guideContent"></div>
+    
+    <div style="margin-top: 20px; text-align: center;">
+        <button id="guideUploadBtn" class="btn-cyber btn-cyber-fill" style="background: linear-gradient(135deg, #00ff9d, #00b894);">📁 Subir estos archivos</button>
+    </div>
+</div>
+
+    <!-- Historial de proyectos recientes -->
+<div class="recent-projects" style="background: #0a0a0f; border-radius: 12px; padding: 20px; margin-top: 30px; border: 1px solid #00f3ff;">
+    <h3 style="color: #00f3ff; margin-bottom: 15px;">📜 Proyectos recientes</h3>
+    <div id="recentProjectsList" style="display: flex; flex-direction: column; gap: 10px;">
+        <p style="color: #888; text-align: center;">No has visitado ningún proyecto aún.</p>
+    </div>
+    <button onclick="clearRecentProjects()" class="btn-cyber btn-cyber-outline" style="margin-top: 15px; padding: 8px 16px;">🗑️ Limpiar historial</button>
+</div>
+
     </div>
 </div>
             </div>
@@ -946,6 +1014,199 @@ async function getAllFilesFromEntry(entry) {
 document.getElementById('docsBtn')?.addEventListener('click', () => {
     window.location.href = '/docs/';
 });
+
+// ==================== HISTORIAL DE PROYECTOS RECIENTES ====================
+
+function saveProjectToHistory(slug, title) {
+    try {
+        // Obtener historial actual
+        let history = JSON.parse(localStorage.getItem('cerbero_history') || '[]');
+        
+        // Eliminar si ya existe (para moverlo al frente)
+        history = history.filter(item => item.slug !== slug);
+        
+        // Agregar al principio
+        history.unshift({
+            slug: slug,
+            title: title || slug,
+            timestamp: Date.now(),
+            url: `/p/${slug}/`
+        });
+        
+        // Limitar a 10 proyectos
+        history = history.slice(0, 10);
+        
+        // Guardar
+        localStorage.setItem('cerbero_history', JSON.stringify(history));
+        
+        // Actualizar la vista
+        displayRecentProjects();
+    } catch(e) {
+        console.error('Error guardando historial:', e);
+    }
+}
+
+function displayRecentProjects() {
+    const container = document.getElementById('recentProjectsList');
+    if (!container) return;
+    
+    try {
+        const history = JSON.parse(localStorage.getItem('cerbero_history') || '[]');
+        
+        if (history.length === 0) {
+            container.innerHTML = '<p style="color: #888; text-align: center;">No has visitado ningún proyecto aún.</p>';
+            return;
+        }
+        
+        container.innerHTML = history.map(item => `
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px; background: #12121a; border-radius: 8px; border-left: 3px solid #00f3ff;">
+                <div>
+                    <a href="${item.url}" style="color: #00f3ff; text-decoration: none; font-weight: bold;">📁 ${item.title}</a>
+                    <div style="color: #888; font-size: 0.7rem; margin-top: 4px;">
+                        ${formatTimestamp(item.timestamp)}
+                    </div>
+                </div>
+                <button onclick="removeFromHistory('${item.slug}')" style="background: transparent; border: none; color: #ff4444; cursor: pointer; font-size: 1.2rem;">🗑️</button>
+            </div>
+        `).join('');
+        
+    } catch(e) {
+        console.error('Error mostrando historial:', e);
+    }
+}
+
+function removeFromHistory(slug) {
+    try {
+        let history = JSON.parse(localStorage.getItem('cerbero_history') || '[]');
+        history = history.filter(item => item.slug !== slug);
+        localStorage.setItem('cerbero_history', JSON.stringify(history));
+        displayRecentProjects();
+    } catch(e) {
+        console.error('Error eliminando del historial:', e);
+    }
+}
+
+function clearRecentProjects() {
+    if (confirm('¿Estás seguro de que quieres borrar todo el historial?')) {
+        localStorage.removeItem('cerbero_history');
+        displayRecentProjects();
+    }
+}
+
+function formatTimestamp(timestamp) {
+    const now = Date.now();
+    const diff = now - timestamp;
+    const minutes = Math.floor(diff / 60000);
+    const hours = Math.floor(diff / 3600000);
+    const days = Math.floor(diff / 86400000);
+    
+    if (minutes < 1) return 'Justo ahora';
+    if (minutes < 60) return `Hace ${minutes} minuto${minutes !== 1 ? 's' : ''}`;
+    if (hours < 24) return `Hace ${hours} hora${hours !== 1 ? 's' : ''}`;
+    return `Hace ${days} día${days !== 1 ? 's' : ''}`;
+}
+
+// Llamar a displayRecentProjects al cargar la página
+document.addEventListener('DOMContentLoaded', function() {
+    displayRecentProjects();
+});
+
+// ==================== GUÍA DE FRAMEWORKS ====================
+const frameworkData = {
+    django: { name: 'Django', files: ['tu_app/', 'templates/', 'static/', 'manage.py', 'requirements.txt'], desc: 'Framework web Python' },
+    flutter: { name: 'Flutter', files: ['lib/', 'assets/', 'pubspec.yaml'], desc: 'Framework móvil Dart' },
+    react: { name: 'React', files: ['src/', 'public/', 'package.json'], desc: 'Biblioteca JavaScript' },
+    angular: { name: 'Angular', files: ['src/app/', 'angular.json', 'package.json'], desc: 'Framework TypeScript' },
+    vue: { name: 'Vue.js', files: ['src/', 'public/', 'package.json'], desc: 'Framework progresivo JavaScript' },
+    node: { name: 'Node.js', files: ['src/', 'routes/', 'package.json', 'server.js'], desc: 'Entorno JavaScript' },
+    spring: { name: 'Spring Boot', files: ['src/main/java/', 'pom.xml'], desc: 'Framework Java' },
+    laravel: { name: 'Laravel', files: ['app/', 'routes/', 'resources/views/', 'composer.json'], desc: 'Framework PHP' },
+    html: { name: 'HTML/CSS/JS', files: ['index.html', 'css/', 'js/', 'assets/'], desc: 'Web estática' }
+};
+
+function showFrameworkGuide(framework) {
+    const data = frameworkData[framework];
+    const guideDiv = document.getElementById('frameworkGuideContent');
+    const contentDiv = document.getElementById('frameworkGuideContent');
+    
+    if (data) {
+        const filesList = data.files.map(f => `<li style="margin-bottom: 8px;">📁 <strong>${f}</strong></li>`).join('');
+        
+        guideDiv.innerHTML = `
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div>
+                    <p style="color: #00ff9d; margin-bottom: 10px;">✅ <strong>${data.name}</strong> - ${data.desc}</p>
+                    <p style="color: #00f3ff; margin-bottom: 10px;">📁 Archivos que debes subir:</p>
+                    <ul style="list-style: none; padding: 0;">
+                        ${filesList}
+                    </ul>
+                </div>
+                <div>
+                    <p style="color: #ffdd59; margin-bottom: 10px;">💡 Consejo:</p>
+                    <p style="color: #888;">No subas carpetas como <strong>venv/</strong>, <strong>node_modules/</strong>, <strong>__pycache__/</strong> o <strong>.git/</strong></p>
+                    <button onclick="copyFrameworkPrompt('${framework}')" class="btn-cyber btn-cyber-outline" style="margin-top: 15px;">📋 Copiar prompt para IA</button>
+                </div>
+            </div>
+        `;
+        guideDiv.style.display = 'block';
+    }
+}
+
+function copyFrameworkPrompt(framework) {
+    const data = frameworkData[framework];
+    const prompt = `🎯 Tengo un proyecto en ${data.name}. Quiero que actúes como mi tutor de programación.
+
+Mi proyecto usa estos archivos principales: ${data.files.join(', ')}
+
+Por favor:
+1. Explícame para qué sirve cada carpeta
+2. Enséñame cómo funciona la estructura
+3. Guíame paso a paso para entender el código
+
+No asumas que sé programar. Quiero aprender.`;
+    
+    navigator.clipboard.writeText(prompt);
+    alert('✅ Prompt copiado. Pégalo en la IA');
+}
+
+// ==================== SELECCIÓN DE LENGUAJE ====================
+let currentLanguage = '';
+
+function selectLanguage(lang) {
+    const langNames = {
+        python: 'Python', javascript: 'JavaScript', typescript: 'TypeScript',
+        java: 'Java', dart: 'Dart', php: 'PHP', csharp: 'C#',
+        go: 'Go', rust: 'Rust', ruby: 'Ruby'
+    };
+    
+    currentLanguage = lang;
+    document.getElementById('selectedLanguage').style.display = 'block';
+    document.getElementById('langDisplay').innerHTML = `${langNames[lang]} (${lang})`;
+    
+    // Marcar el botón seleccionado
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.style.opacity = '0.6';
+        btn.style.borderColor = '#00f3ff';
+    });
+    event.target.style.opacity = '1';
+    event.target.style.borderColor = '#00ff9d';
+}
+
+function copyLanguagePrompt() {
+    if (!currentLanguage) {
+        alert('⚠️ Primero selecciona un lenguaje');
+        return;
+    }
+    
+    const prompt = `📝 Mi proyecto está escrito en ${currentLanguage.toUpperCase()}. 
+    
+Quiero que actúes como mi tutor. Explícame los conceptos clave de este lenguaje que necesito saber para entender mi proyecto.
+
+No asumas que sé nada. Voy empezando.`;
+    
+    navigator.clipboard.writeText(prompt);
+    alert('✅ Prompt de lenguaje copiado. Pégalo en la IA');
+}
     </script>
 
 </body>

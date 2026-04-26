@@ -115,6 +115,8 @@
             <a href="{% url 'download-for-ia' slug=project.slug %}" class="btn">📥 Descargar TXT</a>
             <button onclick="copyMigrationPrompt()" class="btn">🔄 Modo Migración</button>
             <button onclick="copyNavigationMap()" class="btn" style="margin-top: 10px;">🗺️ Mapa del proyecto</button>
+            <button onclick="openCodePreview()" class="btn-cyber btn-cyber-outline">👁️ Vista previa del código</button>
+            <button onclick="copyAllCode()" class="btn-cyber btn-cyber-outline">📋 Copiar todo el código</button>
     <p>🤖 <strong>Framework detectado:</strong> {{ framework }}</p>
     <p>📝 <strong>Lenguaje:</strong> {{ language }}</p>
             
@@ -125,6 +127,38 @@
             <button onclick="copyLink()">📋 Copiar</button>
             
         </div>
+
+        <div class="stats-detailed" style="background: #0a0a0f; border: 1px solid #00f3ff; border-radius: 12px; padding: 20px; margin-top: 20px;">
+    <h3 style="color: #00f3ff; margin-bottom: 15px;">📊 Estadísticas detalladas</h3>
+    <div id="detailedStats" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+        <div style="background: #12121a; padding: 12px; border-radius: 8px; text-align: center;">
+            <div style="font-size: 1.8rem; color: #00ff9d;" id="totalFiles">-</div>
+            <div style="color: #888;">Total archivos</div>
+        </div>
+        <div style="background: #12121a; padding: 12px; border-radius: 8px; text-align: center;">
+            <div style="font-size: 1.8rem; color: #00ff9d;" id="totalLines">-</div>
+            <div style="color: #888;">Líneas de código</div>
+        </div>
+        <div style="background: #12121a; padding: 12px; border-radius: 8px; text-align: center;">
+            <div style="font-size: 1.8rem; color: #00ff9d;" id="totalSize">-</div>
+            <div style="color: #888;">Tamaño total</div>
+        </div>
+    </div>
+    
+    <div id="languagesStats" style="margin-top: 20px;">
+        <h4 style="color: #00ff9d; margin-bottom: 10px;">📝 Lenguajes detectados</h4>
+        <div id="languagesList" style="display: flex; flex-wrap: wrap; gap: 10px;">
+            <span style="color: #888;">Calculando...</span>
+        </div>
+    </div>
+    
+    <div id="fileTypesStats" style="margin-top: 20px;">
+        <h4 style="color: #00ff9d; margin-bottom: 10px;">📁 Tipos de archivo</h4>
+        <div id="fileTypesList" style="display: flex; flex-wrap: wrap; gap: 10px;">
+            <span style="color: #888;">Calculando...</span>
+        </div>
+    </div>
+</div>
         
         <div class="file-list">
             <h3>📁 Archivos ({{ files|length }})</h3>
@@ -150,6 +184,33 @@
         </div>
     </div>
     
+    <!-- Modal de vista previa del código -->
+<div id="codePreviewModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 10000; overflow: auto;">
+    <div style="position: relative; max-width: 1200px; margin: 50px auto; background: #0a0a0f; border: 2px solid #00f3ff; border-radius: 12px; padding: 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid #00f3ff;">
+            <h3 style="color: #00f3ff;">📄 Vista previa del código</h3>
+            <button onclick="closeCodePreview()" style="background: transparent; border: none; color: #ff4444; font-size: 1.5rem; cursor: pointer;">✕</button>
+        </div>
+        
+        <!-- Selector de archivos -->
+        <div style="margin-bottom: 20px;">
+            <label style="color: #00ff9d;">📁 Selecciona un archivo:</label>
+            <select id="previewFileSelect" style="width: 100%; padding: 10px; margin-top: 10px; background: #12121a; border: 1px solid #00f3ff; color: #fff; border-radius: 6px;">
+                <option value="">Cargando archivos...</option>
+            </select>
+        </div>
+        
+        <!-- Área de código -->
+        <div style="background: #050508; border-radius: 8px; padding: 20px; overflow-x: auto; max-height: 500px; overflow-y: auto;">
+            <pre id="codePreviewContent" style="margin: 0; font-family: 'Courier New', monospace; font-size: 0.85rem; line-height: 1.5; color: #00ff9d; white-space: pre-wrap; word-break: break-all;">Selecciona un archivo para ver su contenido...</pre>
+        </div>
+        
+        <div style="margin-top: 20px; text-align: right;">
+            <button onclick="copyPreviewCode()" class="btn-cyber btn-cyber-outline">📋 Copiar este código</button>
+        </div>
+    </div>
+</div>
+
     <script>
         function copyLink() {
             navigator.clipboard.writeText(window.location.href);
@@ -215,6 +276,296 @@ Quiero entender la estructura, no solo copiar código.`;
     navigator.clipboard.writeText(prompt);
     alert('✅ Mapa de navegación copiado');
 }
-    </script>
+
+// ==================== VISTA PREVIA DEL CÓDIGO ====================
+let currentPreviewCode = '';
+
+function openCodePreview() {
+    const modal = document.getElementById('codePreviewModal');
+    const select = document.getElementById('previewFileSelect');
+    
+    modal.style.display = 'block';
+    select.innerHTML = '<option value="">Cargando archivos...</option>';
+    
+    // Cargar lista de archivos
+    fetch(window.location.href + '?mode=json')
+        .then(res => res.json())
+        .then(data => {
+            if (data.files && data.files.length > 0) {
+                select.innerHTML = '<option value="">Selecciona un archivo...</option>';
+                data.files.forEach(file => {
+                    const option = document.createElement('option');
+                    option.value = file.url;
+                    option.textContent = `📄 ${file.name} (${formatFileSize(file.size)})`;
+                    select.appendChild(option);
+                });
+            } else {
+                select.innerHTML = '<option value="">No hay archivos disponibles</option>';
+            }
+        })
+        .catch(err => {
+            console.error('Error cargando archivos:', err);
+            select.innerHTML = '<option value="">Error al cargar archivos</option>';
+        });
+}
+
+function closeCodePreview() {
+    document.getElementById('codePreviewModal').style.display = 'none';
+}
+
+function formatFileSize(bytes) {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+}
+
+function copyPreviewCode() {
+    if (currentPreviewCode) {
+        navigator.clipboard.writeText(currentPreviewCode);
+        alert('✅ Código copiado al portapapeles');
+    } else {
+        alert('⚠️ No hay código para copiar');
+    }
+}
+
+// Cargar el contenido del archivo seleccionado
+document.getElementById('previewFileSelect').addEventListener('change', function() {
+    const fileUrl = this.value;
+    const previewDiv = document.getElementById('codePreviewContent');
+    
+    if (!fileUrl) {
+        previewDiv.innerHTML = 'Selecciona un archivo para ver su contenido...';
+        currentPreviewCode = '';
+        return;
+    }
+    
+    previewDiv.innerHTML = '📥 Cargando archivo...';
+    
+    fetch(fileUrl)
+        .then(res => res.text())
+        .then(content => {
+            // Detectar si es archivo binario
+            if (content.includes('PNG') || content.includes('GIF') || content.includes('JPEG')) {
+                previewDiv.innerHTML = '[ARCHIVO BINARIO - No se puede mostrar en texto plano]';
+                currentPreviewCode = '';
+            } else {
+                // Limitar tamaño para no saturar
+                if (content.length > 50000) {
+                    content = content.substring(0, 50000) + '\n\n... [ARCHIVO TRUNCADO - Demasiado largo]';
+                }
+                previewDiv.innerHTML = escapeHtml(content);
+                currentPreviewCode = content;
+            }
+        })
+        .catch(err => {
+            previewDiv.innerHTML = `❌ Error al cargar el archivo: ${err.message}`;
+            currentPreviewCode = '';
+        });
+});
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+// Cerrar modal con tecla ESC
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeCodePreview();
+    }
+});
+
+async function copyAllCode() {
+    const statusDiv = document.getElementById('copyStatus');
+    if (statusDiv) statusDiv.innerHTML = '📤 Preparando código...';
+    
+    try {
+        // Obtener todos los archivos desde la API
+        const res = await fetch(window.location.href + '?mode=json');
+        const data = await res.json();
+        
+        if (!data.files || data.files.length === 0) {
+            alert('❌ No hay archivos para copiar');
+            return;
+        }
+        
+        let allCode = '';
+        let fileCount = 0;
+        
+        for (const file of data.files) {
+            try {
+                const fileRes = await fetch(file.url);
+                const content = await fileRes.text();
+                
+                // Verificar si es código o binario
+                if (!content.includes('PNG') && !content.includes('GIF') && !content.includes('JPEG')) {
+                    allCode += `=== ${file.name} ===\n`;
+                    allCode += `${content}\n\n`;
+                    fileCount++;
+                }
+            } catch(e) {
+                console.error(`Error leyendo ${file.name}:`, e);
+            }
+        }
+        
+        if (allCode) {
+            await navigator.clipboard.writeText(allCode);
+            if (statusDiv) statusDiv.innerHTML = `✅ Copiados ${fileCount} archivos al portapapeles`;
+            setTimeout(() => { if (statusDiv) statusDiv.innerHTML = ''; }, 3000);
+            alert(`✅ Se copiaron ${fileCount} archivos al portapapeles`);
+        } else {
+            alert('❌ No se pudo copiar ningún archivo');
+        }
+    } catch(error) {
+        console.error('Error:', error);
+        alert('❌ Error al copiar el código');
+        if (statusDiv) statusDiv.innerHTML = '';
+    }
+}
+
+async function loadProjectStats() {
+    const statsDiv = document.getElementById('detailedStats');
+    if (!statsDiv) return;
+    
+    try {
+        const res = await fetch(window.location.href + '?mode=json');
+        const data = await res.json();
+        
+        if (!data.files || data.files.length === 0) {
+            document.getElementById('totalFiles').textContent = '0';
+            document.getElementById('totalLines').textContent = '0';
+            document.getElementById('totalSize').textContent = '0 B';
+            return;
+        }
+        
+        let totalLines = 0;
+        let totalSize = 0;
+        const languages = {};
+        const fileTypes = {};
+        
+        for (const file of data.files) {
+            totalSize += file.size;
+            
+            // Detectar extensión
+            const ext = file.name.split('.').pop().toLowerCase();
+            const extName = getLanguageName(ext);
+            
+            if (extName !== 'binario') {
+                fileTypes[extName] = (fileTypes[extName] || 0) + 1;
+            }
+            
+            // Contar líneas de código
+            try {
+                const fileRes = await fetch(file.url);
+                const content = await fileRes.text();
+                
+                if (!content.includes('PNG') && !content.includes('GIF') && !content.includes('JPEG')) {
+                    const lines = content.split('\n').length;
+                    totalLines += lines;
+                    
+                    // Detectar lenguaje principal
+                    if (lines > 10) {
+                        languages[extName] = (languages[extName] || 0) + lines;
+                    }
+                } else {
+                    fileTypes['binario'] = (fileTypes['binario'] || 0) + 1;
+                }
+            } catch(e) {
+                fileTypes['binario'] = (fileTypes['binario'] || 0) + 1;
+            }
+        }
+        
+        // Actualizar UI
+        document.getElementById('totalFiles').textContent = data.files.length;
+        document.getElementById('totalLines').textContent = totalLines.toLocaleString();
+        document.getElementById('totalSize').textContent = formatFileSize(totalSize);
+        
+        // Mostrar lenguajes
+        const sortedLangs = Object.entries(languages).sort((a,b) => b[1] - a[1]);
+        const languagesHtml = sortedLangs.map(([lang, lines]) => `
+            <div style="background: #1a1a2a; padding: 8px 16px; border-radius: 20px; border-left: 3px solid #00ff9d;">
+                <strong>${lang}</strong> <span style="color: #888;">(${lines.toLocaleString()} líneas)</span>
+            </div>
+        `).join('');
+        
+        document.getElementById('languagesList').innerHTML = languagesHtml || '<span style="color: #888;">No se detectaron lenguajes</span>';
+        
+        // Mostrar tipos de archivo
+        const sortedTypes = Object.entries(fileTypes).sort((a,b) => b[1] - a[1]);
+        const typesHtml = sortedTypes.map(([type, count]) => `
+            <div style="background: #1a1a2a; padding: 8px 16px; border-radius: 20px;">
+                📄 ${type}: <strong>${count}</strong> archivo${count !== 1 ? 's' : ''}
+            </div>
+        `).join('');
+        
+        document.getElementById('fileTypesList').innerHTML = typesHtml || '<span style="color: #888;">No hay archivos</span>';
+        
+    } catch(error) {
+        console.error('Error cargando estadísticas:', error);
+        document.getElementById('totalFiles').textContent = 'Error';
+        document.getElementById('totalLines').textContent = 'Error';
+    }
+}
+
+function getLanguageName(ext) {
+    const languages = {
+        'py': 'Python',
+        'js': 'JavaScript',
+        'ts': 'TypeScript',
+        'html': 'HTML',
+        'css': 'CSS',
+        'scss': 'SCSS',
+        'json': 'JSON',
+        'md': 'Markdown',
+        'java': 'Java',
+        'dart': 'Dart',
+        'go': 'Go',
+        'rs': 'Rust',
+        'cpp': 'C++',
+        'c': 'C',
+        'php': 'PHP',
+        'rb': 'Ruby',
+        'sql': 'SQL',
+        'xml': 'XML',
+        'yaml': 'YAML',
+        'yml': 'YAML',
+        'txt': 'Texto',
+        'binario': 'Binario'
+    };
+    return languages[ext] || ext.toUpperCase();
+}
+
+function formatFileSize(bytes) {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+}
+
+// Llamar a la función cuando la página carga
+document.addEventListener('DOMContentLoaded', function() {
+    loadProjectStats();
+});
+
+// Guardar en historial
+function addCurrentToHistory() {
+    const slug = '{{ project.slug|escapejs }}';
+    const title = '{{ project.title|default:project.slug|escapejs }}';
+    
+    try {
+        let history = JSON.parse(localStorage.getItem('cerbero_history') || '[]');
+        history = history.filter(item => item.slug !== slug);
+        history.unshift({ slug: slug, title: title, timestamp: Date.now(), url: `/p/${slug}/` });
+        history = history.slice(0, 10);
+        localStorage.setItem('cerbero_history', JSON.stringify(history));
+    } catch(e) {
+        console.error('Error guardando historial:', e);
+    }
+}
+
+// Llamar cuando carga la página
+addCurrentToHistory();
+
+</script>
 </body>
 </html>

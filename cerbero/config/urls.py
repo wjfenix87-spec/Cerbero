@@ -16,6 +16,7 @@ urlpatterns = [
     path('api/', include('core.urls')),
     path('api/projects/', include('projects.urls')),
     path('docs/', TemplateView.as_view(template_name='core/docs.html'), name='docs'),
+    path('upload-guide/<str:framework>/', core_views.upload_guide, name='upload-guide'),
 
 ]
 

@@ -162,11 +162,73 @@ def upload_file(request):
 @csrf_exempt
 @require_http_methods(["POST"])
 def upload_folder(request):
-    """Subir carpeta completa con estructura"""
     try:
         user = get_user_from_request(request)
         expiration_hours = request.POST.get('expiration')
         
+        files = request.FILES.getlist('files')
+        if not files:
+            return JsonResponse({'error': 'No se subió ninguna carpeta'}, status=400)
+        
+        # ===== FILTRO DE ARCHIVOS BASURA =====
+        IGNORE_FOLDERS = [
+            'venv/', 'env/', '.venv/', '__pycache__/', '.git/',
+            'node_modules/', '.idea/', '.vscode/', '.pytest_cache/',
+            'build/', 'dist/', 'target/', '.gradle/', '.mvn/'
+        ]
+        
+        IGNORE_EXTENSIONS = [
+            '.pyc', '.pyo', '.so', '.dll', '.exe', '.log', 
+            '.tmp', '.cache', '.DS_Store', 'Thumbs.db'
+        ]
+        
+        IMPORTANT_EXTENSIONS = [
+            '.py', '.js', '.html', '.css', '.json', '.yaml', '.yml',
+            '.md', '.txt', '.xml', '.sql', '.java', '.c', '.cpp', 
+            '.h', '.php', '.rb', '.go', '.rs', '.ts', '.jsx', '.tsx'
+        ]
+        
+        filtered_files = []
+        ignored_count = 0
+        
+        for file in files:
+            should_ignore = False
+            
+            # 1. Ignorar por carpeta
+            for folder in IGNORE_FOLDERS:
+                if folder in file.name.lower():
+                    should_ignore = True
+                    break
+            
+            # 2. Ignorar por extensión basura
+            for ext in IGNORE_EXTENSIONS:
+                if file.name.lower().endswith(ext):
+                    should_ignore = True
+                    break
+            
+            # 3. Si no es importante y no es extensión conocida, ignorar
+            is_important = False
+            for ext in IMPORTANT_EXTENSIONS:
+                if file.name.lower().endswith(ext):
+                    is_important = True
+                    break
+            
+            # Archivos sin extensión importante y que no están en la lista blanca
+            if not is_important and not should_ignore:
+                # Conservar archivos de configuración comunes
+                important_configs = ['dockerfile', 'makefile', 'readme', 'license', 'gitignore']
+                if not any(cfg in file.name.lower() for cfg in important_configs):
+                    should_ignore = True
+            
+            if should_ignore:
+                ignored_count += 1
+                continue
+            
+            filtered_files.append(file)
+        
+        print(f"📊 Archivos: {len(files)} totales → {len(filtered_files)} importantes → {ignored_count} ignorados")
+        
+        # ===== CREAR PROYECTO =====
         project = Project.objects.create(user=user)
         
         if expiration_hours:
@@ -177,39 +239,36 @@ def upload_folder(request):
             except:
                 pass
         
-        files = request.FILES.getlist('files')
-        paths = request.POST.getlist('paths')
-        
-        uploaded_files = []
-        for i, file in enumerate(files):
-            file_path = paths[i] if i < len(paths) else file.name
-            
-            project_file = ProjectFile.objects.create(
+        # ===== GUARDAR ARCHIVOS IMPORTANTES =====
+        for file in filtered_files[:5000]:  # Límite de seguridad
+            ProjectFile.objects.create(
                 project=project,
                 file=file,
-                original_name=file_path,
+                original_name=file.name,
                 size=file.size,
                 file_type=file.content_type or 'application/octet-stream'
             )
-            uploaded_files.append({'name': file_path, 'size': file.size})
         
         return JsonResponse({
             'success': True,
             'slug': project.slug,
             'url': f'/p/{project.slug}/',
             'full_url': request.build_absolute_uri(f'/p/{project.slug}/'),
-            'count': len(uploaded_files),
-            'files': uploaded_files
+            'count': len(filtered_files),
+            'ignored': ignored_count,
+            'total': len(files)
         })
         
     except Exception as e:
+        print(f"Error: {e}")
+        import traceback
+        traceback.print_exc()
         return JsonResponse({'error': str(e)}, status=500)
 
 
 @csrf_exempt
 @require_http_methods(["POST"])
 def upload_zip(request):
-    """Subir y descomprimir archivo ZIP"""
     try:
         zip_file = request.FILES.get('zip_file')
         if not zip_file:
@@ -228,30 +287,53 @@ def upload_zip(request):
             except:
                 pass
         
-        # Descomprimir en directorio temporal
+        # MISMAS LISTAS DE FILTRO
+        IGNORE_FOLDERS = ['venv/', 'env/', '.venv/', '__pycache__/', '.git/', 'node_modules/', '.idea/', '.vscode/']
+        IGNORE_EXTENSIONS = ['.pyc', '.pyo', '.so', '.dll', '.exe', '.log', '.tmp', '.cache']
+        IMPORTANT_EXTENSIONS = ['.py', '.js', '.html', '.css', '.json', '.yaml', '.md', '.txt', '.xml', '.sql']
+        
+        import tempfile, zipfile, os
         with tempfile.TemporaryDirectory() as tmpdir:
             zip_path = os.path.join(tmpdir, 'project.zip')
-            
             with open(zip_path, 'wb') as f:
                 for chunk in zip_file.chunks():
                     f.write(chunk)
             
             extracted_count = 0
+            ignored_count = 0
+            
             with zipfile.ZipFile(zip_path, 'r') as zf:
                 for file_info in zf.infolist():
                     if file_info.is_dir():
                         continue
                     
+                    should_ignore = False
+                    for folder in IGNORE_FOLDERS:
+                        if folder in file_info.filename.lower():
+                            should_ignore = True
+                            break
+                    
+                    for ext in IGNORE_EXTENSIONS:
+                        if file_info.filename.lower().endswith(ext):
+                            should_ignore = True
+                            break
+                    
+                    is_important = any(file_info.filename.lower().endswith(ext) for ext in IMPORTANT_EXTENSIONS)
+                    if not is_important and not should_ignore:
+                        should_ignore = True
+                    
+                    if should_ignore:
+                        ignored_count += 1
+                        continue
+                    
                     content = zf.read(file_info)
                     from django.core.files.base import ContentFile
-                    
-                    project_file = ProjectFile(
+                    ProjectFile.objects.create(
                         project=project,
                         original_name=file_info.filename,
                         size=file_info.file_size,
                         file_type='application/octet-stream'
-                    )
-                    project_file.file.save(file_info.filename, ContentFile(content))
+                    ).file.save(file_info.filename, ContentFile(content))
                     extracted_count += 1
         
         return JsonResponse({
@@ -259,11 +341,10 @@ def upload_zip(request):
             'slug': project.slug,
             'url': f'/p/{project.slug}/',
             'full_url': request.build_absolute_uri(f'/p/{project.slug}/'),
-            'count': extracted_count
+            'count': extracted_count,
+            'ignored': ignored_count
         })
         
-    except zipfile.BadZipFile:
-        return JsonResponse({'error': 'El archivo no es un ZIP válido'}, status=400)
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
 

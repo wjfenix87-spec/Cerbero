@@ -1,0 +1,719 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CERBERO — Acceso al Sistema</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: { extend: { fontFamily: { inter: ['Inter', 'sans-serif'] } } }
+    }
+  </script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #050505;
+      margin: 0;
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes slideRight {
+      from { opacity: 0; transform: translateX(-50px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes fireGlow {
+      0%, 100% { text-shadow: 0 0 6px rgba(255,100,20,0.3), 0 0 20px rgba(255,50,0,0.12); }
+      50% { text-shadow: 0 0 14px rgba(255,130,40,0.5), 0 0 40px rgba(255,70,0,0.2); }
+    }
+    @keyframes borderPulse {
+      0%, 100% { border-color: rgba(255,255,255,0.06); }
+      50% { border-color: rgba(255,80,20,0.15); }
+    }
+    @keyframes pulseDot {
+      0%, 100% { opacity: 0.4; }
+      50% { opacity: 1; }
+    }
+    @keyframes scanline {
+      0% { transform: translateY(-100%); }
+      100% { transform: translateY(100vh); }
+    }
+    @keyframes floatParticle {
+      0%, 100% { transform: translateY(0) translateX(0); opacity: 0; }
+      10% { opacity: 0.5; }
+      90% { opacity: 0.5; }
+      100% { transform: translateY(-100vh) translateX(20px); opacity: 0; }
+    }
+    @keyframes inputGlow {
+      0%, 100% { box-shadow: 0 0 0 1px rgba(255,255,255,0.06); }
+      50% { box-shadow: 0 0 0 1px rgba(255,80,20,0.12); }
+    }
+    @keyframes successPulse {
+      0% { transform: scale(0); opacity: 0; }
+      50% { transform: scale(1.15); opacity: 1; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-8px); }
+      40% { transform: translateX(8px); }
+      60% { transform: translateX(-5px); }
+      80% { transform: translateX(5px); }
+    }
+    @keyframes imgFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-6px); }
+    }
+
+    .view { display: none; }
+    .view.active { display: flex; }
+    .animate-fade-up { animation: fadeUp 0.7s ease-out forwards; opacity: 0; }
+    .animate-fade-in { animation: fadeIn 0.8s ease-out forwards; opacity: 0; }
+    .animate-slide-right { animation: slideRight 0.6s ease-out forwards; opacity: 0; }
+    .delay-100 { animation-delay: 0.1s; }
+    .delay-200 { animation-delay: 0.2s; }
+    .delay-300 { animation-delay: 0.3s; }
+    .delay-400 { animation-delay: 0.4s; }
+    .delay-500 { animation-delay: 0.5s; }
+    .delay-600 { animation-delay: 0.6s; }
+    .delay-700 { animation-delay: 0.7s; }
+    .delay-800 { animation-delay: 0.8s; }
+
+    .cerbero-input {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      color: white;
+      transition: all 0.3s ease;
+      animation: inputGlow 4s ease-in-out infinite;
+    }
+    .cerbero-input:focus {
+      outline: none;
+      border-color: rgba(255,80,20,0.4);
+      background: rgba(255,255,255,0.05);
+      box-shadow: 0 0 20px rgba(255,80,20,0.08);
+      animation: none;
+    }
+    .cerbero-input::placeholder { color: rgba(255,255,255,0.2); }
+
+    .cerbero-check {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 16px; height: 16px;
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 4px;
+      background: rgba(255,255,255,0.03);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+      flex-shrink: 0;
+    }
+    .cerbero-check:checked {
+      background: linear-gradient(135deg, #ff3333, #cc4400);
+      border-color: #ff4422;
+    }
+    .cerbero-check:checked::after {
+      content: '';
+      position: absolute;
+      left: 4.5px; top: 1.5px;
+      width: 5px; height: 9px;
+      border: solid white;
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg);
+    }
+
+    .btn-fire {
+      position: relative; overflow: hidden;
+      background: linear-gradient(135deg, #cc2200, #ff3311);
+      transition: all 0.3s ease;
+    }
+    .btn-fire::before {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(135deg, #ff5522, #ff8844);
+      opacity: 0; transition: opacity 0.3s ease;
+    }
+    .btn-fire:hover::before { opacity: 1; }
+    .btn-fire:hover { transform: translateY(-1px); box-shadow: 0 8px 30px rgba(255,50,0,0.25); }
+    .btn-fire:active { transform: translateY(0); }
+    .btn-fire span { position: relative; z-index: 1; }
+
+    .btn-ghost {
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.08);
+      transition: all 0.3s ease;
+    }
+    .btn-ghost:hover { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.15); }
+
+    .link-fire {
+      color: rgba(255,120,50,0.7);
+      text-decoration: none;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+    .link-fire:hover { color: rgba(255,150,70,1); text-shadow: 0 0 12px rgba(255,80,20,0.3); }
+
+    .auth-card {
+      background: rgba(10,10,10,0.8);
+      border: 1px solid rgba(255,255,255,0.06);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      animation: borderPulse 6s ease-in-out infinite;
+    }
+
+    .scanline-overlay {
+      pointer-events: none; position: fixed; inset: 0; z-index: 999; overflow: hidden;
+    }
+    .scanline-overlay::before {
+      content: ''; position: absolute; width: 100%; height: 3px;
+      background: rgba(255,100,50,0.02); animation: scanline 6s linear infinite;
+    }
+
+    .particle {
+      position: absolute; width: 2px; height: 2px; border-radius: 50%;
+      animation: floatParticle linear infinite;
+    }
+
+    .toast-show { opacity: 1 !important; transform: translateX(-50%) translateY(0) !important; pointer-events: auto !important; }
+
+    .sep { height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent); }
+
+    .pw-toggle { cursor: pointer; color: rgba(255,255,255,0.2); transition: color 0.2s ease; }
+    .pw-toggle:hover { color: rgba(255,255,255,0.5); }
+
+    .shake { animation: shake 0.4s ease; }
+    .text-fire { animation: fireGlow 3s ease-in-out infinite; }
+
+    .top-img {
+      animation: imgFloat 4s ease-in-out infinite;
+    }
+
+    .bg-scene {
+      mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, black 30%, transparent 85%);
+      -webkit-mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, black 30%, transparent 85%);
+    }
+  </style>
+</head>
+<body class="font-inter text-white">
+
+  <div class="scanline-overlay"></div>
+  <div id="particles" class="fixed inset-0 pointer-events-none z-10"></div>
+
+  <!-- ═══ FONDO: 1.jpg ═══ -->
+  <div class="fixed inset-0 z-0">
+    <img src="{% static 'assets/1.jpg' %}" alt="Sistema Cerbero" class="w-full h-full object-cover bg-scene opacity-20 scale-110" />
+    <div class="absolute inset-0 bg-[#050505]/60"></div>
+    <div class="absolute inset-0 bg-gradient-to-t from-[#050505] via-transparent to-[#050505]/50"></div>
+    <div class="absolute inset-0" style="box-shadow: inset 0 0 120px 40px rgba(0,0,0,0.6);"></div>
+  </div>
+
+  <!-- ═══ IMAGEN PEQUEÑA ARRIBA: 2.png ═══ -->
+  <div class="fixed top-5 right-5 z-[100] top-img">
+    <a href="{% url 'index' %}">
+      <img src="{% static 'assets/2.png' %}" alt="CERBERO" class="w-11 h-11 md:w-14 md:h-14 object-contain drop-shadow-[0_0_12px_rgba(255,60,0,0.2)] hover:drop-shadow-[0_0_20px_rgba(255,60,0,0.4)] transition-all duration-300 hover:scale-110" />
+    </a>
+  </div>
+
+  <!-- ═══ TOAST ═══ -->
+  <div id="toast" class="fixed top-6 left-1/2 -translate-x-1/2 z-[200] opacity-0 translate-y-[-10px] transition-all duration-400 pointer-events-none">
+    <div class="flex items-center gap-3 bg-black/70 border border-white/10 backdrop-blur-xl rounded-xl px-5 py-3 shadow-2xl">
+      <span id="toastIcon" class="w-2 h-2 rounded-full bg-green-400" style="animation: pulseDot 2s ease-in-out infinite;"></span>
+      <span id="toastText" class="text-sm font-mono text-neutral-300"></span>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- VISTA: INICIO DE SESIÓN -->
+  <!-- ═══════════════════════════════════════ -->
+  <div id="viewLogin" class="view min-h-screen flex-col items-center justify-center relative px-4">
+    <div class="relative z-20 w-full max-w-md">
+      <a href="{% url 'index' %}" class="animate-slide-right flex items-center gap-2 text-neutral-600 hover:text-neutral-400 transition-colors mb-8 group">
+        <svg class="w-4 h-4 transition-transform group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/>
+        </svg>
+        <span class="text-xs font-mono tracking-wider uppercase">Volver</span>
+      </a>
+
+      <div class="auth-card rounded-3xl p-8 md:p-10">
+        <div class="text-center mb-8">
+          <div class="animate-fade-up inline-flex items-center justify-center w-12 h-12 rounded-xl bg-red-500/10 mb-4">
+            <svg class="w-6 h-6 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/>
+            </svg>
+          </div>
+          <h2 class="animate-fade-up delay-100 text-xl font-bold tracking-tight">Iniciar sesión</h2>
+          <p class="animate-fade-up delay-200 text-xs text-neutral-500 mt-1">Accede al ecosistema Cerbero</p>
+        </div>
+
+        <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4">
+          <div class="animate-fade-up delay-200">
+            <label class="block text-[10px] font-mono uppercase tracking-[0.15em] text-neutral-500 mb-2">Usuario</label>
+            <div class="relative">
+              <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/>
+              </svg>
+              <input id="loginUser" type="text" placeholder="tu.usuario" required class="cerbero-input w-full pl-11 pr-4 py-3 rounded-xl text-sm" autocomplete="username" />
+            </div>
+          </div>
+
+          <div class="animate-fade-up delay-300">
+            <label class="block text-[10px] font-mono uppercase tracking-[0.15em] text-neutral-500 mb-2">Contraseña</label>
+            <div class="relative">
+              <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/>
+              </svg>
+              <input id="loginPass" type="password" placeholder="••••••••" required class="cerbero-input w-full pl-11 pr-11 py-3 rounded-xl text-sm" autocomplete="current-password" />
+              <button type="button" onclick="togglePw('loginPass', this)" class="pw-toggle absolute right-3.5 top-1/2 -translate-y-1/2">
+                <svg class="w-4 h-4 eye-open" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/>
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="animate-fade-up delay-400 flex items-center justify-between pt-1">
+            <label class="flex items-center gap-2.5 cursor-pointer group">
+              <input id="rememberCheck" type="checkbox" class="cerbero-check" />
+              <span class="text-xs text-neutral-500 group-hover:text-neutral-400 transition-colors select-none">Recordar sesión</span>
+            </label>
+            <span onclick="goTo('viewRecover')" class="link-fire text-xs">Recuperar acceso</span>
+          </div>
+
+          <div id="loginError" class="hidden text-xs text-red-400 font-mono text-center py-1"></div>
+
+          <div class="animate-fade-up delay-500 pt-2">
+            <button type="submit" class="btn-fire w-full py-3.5 rounded-xl text-sm font-semibold tracking-wide">
+              <span class="flex items-center justify-center gap-2">
+                Acceder
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"/>
+                </svg>
+              </span>
+            </button>
+          </div>
+        </form>
+
+        <div class="animate-fade-in delay-600 sep my-6"></div>
+
+        <div class="animate-fade-up delay-600 text-center">
+          <span class="text-xs text-neutral-600">¿No tenés cuenta?</span>
+          <span onclick="goTo('viewRegister')" class="link-fire text-xs ml-1.5">Crear cuenta</span>
+        </div>
+      </div>
+
+      <div class="animate-fade-in delay-800 mt-6 flex items-center justify-center gap-4 text-[10px] font-mono text-neutral-700">
+        <span class="flex items-center gap-1.5">
+          <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/></svg>
+          Conexión segura
+        </span>
+        <span class="w-1 h-1 rounded-full bg-neutral-800"></span>
+        <span>CERBERO Systems</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- VISTA: REGISTRO -->
+  <!-- ═══════════════════════════════════════ -->
+  <div id="viewRegister" class="view min-h-screen flex-col items-center justify-center relative px-4">
+    <div class="relative z-20 w-full max-w-md">
+      <button onclick="goTo('viewLogin')" class="animate-slide-right flex items-center gap-2 text-neutral-600 hover:text-neutral-400 transition-colors mb-8 group">
+        <svg class="w-4 h-4 transition-transform group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/>
+        </svg>
+        <span class="text-xs font-mono tracking-wider uppercase">Volver</span>
+      </button>
+
+      <div class="auth-card rounded-3xl p-8 md:p-10">
+        <div class="text-center mb-8">
+          <div class="animate-fade-up inline-flex items-center justify-center w-12 h-12 rounded-xl bg-green-500/10 mb-4">
+            <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM4 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.318 12.318 0 0110.374 21c-2.331 0-4.512-.645-6.374-1.766z"/>
+            </svg>
+          </div>
+          <h2 class="animate-fade-up delay-100 text-xl font-bold tracking-tight">Crear cuenta</h2>
+          <p class="animate-fade-up delay-200 text-xs text-neutral-500 mt-1">Únete al ecosistema Cerbero</p>
+        </div>
+
+        <form id="registerForm" onsubmit="handleRegister(event)" class="space-y-4">
+          <div class="animate-fade-up delay-200">
+            <label class="block text-[10px] font-mono uppercase tracking-[0.15em] text-neutral-500 mb-2">Usuario</label>
+            <div class="relative">
+              <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/>
+              </svg>
+              <input id="regUser" type="text" placeholder="tu.usuario" required minlength="3" class="cerbero-input w-full pl-11 pr-4 py-3 rounded-xl text-sm" autocomplete="username" />
+            </div>
+          </div>
+
+          <div class="animate-fade-up delay-300">
+            <label class="block text-[10px] font-mono uppercase tracking-[0.15em] text-neutral-500 mb-2">Email</label>
+            <div class="relative">
+              <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"/>
+              </svg>
+              <input id="regEmail" type="email" placeholder="tu@email.com" required class="cerbero-input w-full pl-11 pr-4 py-3 rounded-xl text-sm" autocomplete="email" />
+            </div>
+          </div>
+
+          <div class="animate-fade-up delay-400">
+            <label class="block text-[10px] font-mono uppercase tracking-[0.15em] text-neutral-500 mb-2">Contraseña</label>
+            <div class="relative">
+              <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/>
+              </svg>
+              <input id="regPass" type="password" placeholder="Mínimo 6 caracteres" required minlength="6" class="cerbero-input w-full pl-11 pr-11 py-3 rounded-xl text-sm" autocomplete="new-password" />
+              <button type="button" onclick="togglePw('regPass', this)" class="pw-toggle absolute right-3.5 top-1/2 -translate-y-1/2">
+                <svg class="w-4 h-4 eye-open" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/>
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="animate-fade-up delay-500">
+            <label class="block text-[10px] font-mono uppercase tracking-[0.15em] text-neutral-500 mb-2">Confirmar contraseña</label>
+            <div class="relative">
+              <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/>
+              </svg>
+              <input id="regConfirm" type="password" placeholder="Repetir contraseña" required class="cerbero-input w-full pl-11 pr-4 py-3 rounded-xl text-sm" autocomplete="new-password" />
+            </div>
+          </div>
+
+          <div id="regError" class="hidden text-xs text-red-400 font-mono text-center py-1"></div>
+
+          <div class="animate-fade-up delay-600 pt-2">
+            <button type="submit" class="btn-fire w-full py-3.5 rounded-xl text-sm font-semibold tracking-wide">
+              <span class="flex items-center justify-center gap-2">
+                Crear cuenta
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
+                </svg>
+              </span>
+            </button>
+          </div>
+        </form>
+
+        <div class="animate-fade-in delay-700 sep my-6"></div>
+
+        <div class="animate-fade-up delay-700 text-center">
+          <span class="text-xs text-neutral-600">¿Ya tenés cuenta?</span>
+          <span onclick="goTo('viewLogin')" class="link-fire text-xs ml-1.5">Iniciar sesión</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- VISTA: RECUPERAR CONTRASEÑA -->
+  <!-- ═══════════════════════════════════════ -->
+  <div id="viewRecover" class="view min-h-screen flex-col items-center justify-center relative px-4">
+    <div class="relative z-20 w-full max-w-md">
+      <button onclick="goTo('viewLogin')" class="animate-slide-right flex items-center gap-2 text-neutral-600 hover:text-neutral-400 transition-colors mb-8 group">
+        <svg class="w-4 h-4 transition-transform group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/>
+        </svg>
+        <span class="text-xs font-mono tracking-wider uppercase">Volver</span>
+      </button>
+
+      <div class="auth-card rounded-3xl p-8 md:p-10">
+        <div class="text-center mb-8">
+          <div class="animate-fade-up inline-flex items-center justify-center w-12 h-12 rounded-xl bg-orange-500/10 mb-4">
+            <svg class="w-6 h-6 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25a3 3 0 013 3m3 0a6 6 0 01-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1121.75 8.25z"/>
+            </svg>
+          </div>
+          <h2 class="animate-fade-up delay-100 text-xl font-bold tracking-tight">Recuperar acceso</h2>
+          <p class="animate-fade-up delay-200 text-xs text-neutral-500 mt-1">Te enviaremos un enlace de recuperación</p>
+        </div>
+
+        <form id="recoverForm" onsubmit="handleRecover(event)" class="space-y-4">
+          <div class="animate-fade-up delay-200">
+            <label class="block text-[10px] font-mono uppercase tracking-[0.15em] text-neutral-500 mb-2">Email de registro</label>
+            <div class="relative">
+              <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"/>
+              </svg>
+              <input id="recoverEmail" type="email" placeholder="tu@email.com" required class="cerbero-input w-full pl-11 pr-4 py-3 rounded-xl text-sm" autocomplete="email" />
+            </div>
+          </div>
+
+          <div id="recoverMsg" class="hidden text-xs text-center py-3 font-mono rounded-xl"></div>
+          <div id="recoverError" class="hidden text-xs text-red-400 font-mono text-center py-1"></div>
+
+          <div id="recoverBtnWrap" class="animate-fade-up delay-300 pt-2">
+            <button type="submit" class="btn-fire w-full py-3.5 rounded-xl text-sm font-semibold tracking-wide">
+              <span class="flex items-center justify-center gap-2">
+                Enviar enlace
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"/>
+                </svg>
+              </span>
+            </button>
+          </div>
+        </form>
+
+        <div class="animate-fade-in delay-500 sep my-6"></div>
+
+        <div class="animate-fade-up delay-500 text-center">
+          <span class="text-xs text-neutral-600">¿Te acordaste?</span>
+          <span onclick="goTo('viewLogin')" class="link-fire text-xs ml-1.5">Iniciar sesión</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- VISTA: DASHBOARD -->
+  <!-- ═══════════════════════════════════════ -->
+  <div id="viewDashboard" class="view min-h-screen flex-col items-center justify-center relative px-4">
+    <div class="absolute inset-0 z-0">
+      <div class="absolute top-1/3 left-1/4 w-[400px] h-[400px] bg-green-500/[0.03] rounded-full blur-[150px]"></div>
+      <div class="absolute bottom-1/3 right-1/4 w-[350px] h-[350px] bg-red-500/[0.02] rounded-full blur-[120px]"></div>
+    </div>
+
+    <div class="relative z-20 text-center max-w-lg mx-auto">
+      <div class="animate-fade-up inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-green-500/10 mb-6" style="animation: successPulse 0.6s ease-out forwards, fadeUp 0.7s ease-out forwards;">
+        <svg class="w-10 h-10 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12z"/>
+        </svg>
+      </div>
+
+      <h2 class="animate-fade-up delay-100 text-3xl md:text-4xl font-bold tracking-tight mb-2">Bienvenido</h2>
+      <p id="dashUser" class="animate-fade-up delay-200 text-fire text-lg font-semibold mb-2"></p>
+      <p class="animate-fade-up delay-300 text-sm text-neutral-500 mb-10">Has accedido al ecosistema Cerbero correctamente</p>
+
+      <div class="animate-fade-up delay-400 grid grid-cols-3 gap-3 mb-10">
+        <div class="bg-white/[0.02] border border-white/[0.06] rounded-xl p-4">
+          <p class="text-xl font-bold text-red-400">3</p>
+          <p class="text-[10px] font-mono text-neutral-600 uppercase mt-1">Módulos</p>
+        </div>
+        <div class="bg-white/[0.02] border border-white/[0.06] rounded-xl p-4">
+          <p class="text-xl font-bold text-orange-400">99%</p>
+          <p class="text-[10px] font-mono text-neutral-600 uppercase mt-1">Uptime</p>
+        </div>
+        <div class="bg-white/[0.02] border border-white/[0.06] rounded-xl p-4">
+          <p class="text-xl font-bold text-green-400">OK</p>
+          <p class="text-[10px] font-mono text-neutral-600 uppercase mt-1">Estado</p>
+        </div>
+      </div>
+
+      <div class="animate-fade-up delay-500">
+        <button onclick="handleLogout()" class="btn-ghost inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm text-neutral-400">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"/>
+          </svg>
+          Cerrar sesión
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- JAVASCRIPT -->
+  <!-- ═══════════════════════════════════════ -->
+  <script>
+    (function() {
+      var c = document.getElementById('particles');
+      var cols = ['#ff4422', '#ff8844', '#00ff88', '#ffffff'];
+      for (var i = 0; i < 20; i++) {
+        var p = document.createElement('div');
+        p.classList.add('particle');
+        p.style.left = Math.random() * 100 + '%';
+        p.style.bottom = '-10px';
+        p.style.backgroundColor = cols[Math.floor(Math.random() * cols.length)];
+        p.style.animationDuration = (7 + Math.random() * 10) + 's';
+        p.style.animationDelay = (Math.random() * 8) + 's';
+        p.style.opacity = 0;
+        c.appendChild(p);
+      }
+    })();
+
+    function goTo(viewId) {
+      document.querySelectorAll('.view').forEach(function(v) { v.classList.remove('active'); });
+      document.getElementById(viewId).classList.add('active');
+      document.querySelectorAll('[id$="Error"]').forEach(function(e) { e.classList.add('hidden'); e.textContent = ''; });
+      if (viewId === 'viewLogin') {
+        var saved = getSavedCredentials();
+        if (saved) {
+          document.getElementById('loginUser').value = saved.user;
+          document.getElementById('loginPass').value = saved.pass;
+          document.getElementById('rememberCheck').checked = true;
+        } else {
+          document.getElementById('loginUser').value = '';
+          document.getElementById('loginPass').value = '';
+          document.getElementById('rememberCheck').checked = false;
+        }
+      }
+      if (viewId === 'viewRecover') {
+        document.getElementById('recoverForm').reset();
+        document.getElementById('recoverMsg').classList.add('hidden');
+        document.getElementById('recoverBtnWrap').style.display = '';
+      }
+      window.scrollTo(0, 0);
+    }
+
+    function togglePw(inputId, btn) {
+      var input = document.getElementById(inputId);
+      var icon = btn.querySelector('.eye-open');
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88"/>';
+      } else {
+        input.type = 'password';
+        icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>';
+      }
+    }
+
+    function showToast(msg, type) {
+      var toast = document.getElementById('toast');
+      var text = document.getElementById('toastText');
+      var icon = document.getElementById('toastIcon');
+      text.textContent = msg;
+      icon.className = 'w-2 h-2 rounded-full';
+      icon.style.animation = 'pulseDot 2s ease-in-out infinite';
+      if (type === 'error') icon.classList.add('bg-red-400');
+      else if (type === 'warn') icon.classList.add('bg-orange-400');
+      else icon.classList.add('bg-green-400');
+      toast.classList.add('toast-show');
+      setTimeout(function() { toast.classList.remove('toast-show'); }, 3000);
+    }
+
+    function showError(id, msg) {
+      var el = document.getElementById(id);
+      el.textContent = msg;
+      el.classList.remove('hidden');
+      var card = el.closest('.auth-card');
+      if (card) { card.classList.add('shake'); setTimeout(function() { card.classList.remove('shake'); }, 400); }
+    }
+
+    function getUsers() { return JSON.parse(localStorage.getItem('cerbero_users') || '{}'); }
+    function saveUsers(users) { localStorage.setItem('cerbero_users', JSON.stringify(users)); }
+    function saveCredentials(user, pass) { localStorage.setItem('cerbero_remember', JSON.stringify({ user: user, pass: pass })); }
+    function clearSavedCredentials() { localStorage.removeItem('cerbero_remember'); }
+    function getSavedCredentials() { try { return JSON.parse(localStorage.getItem('cerbero_remember')); } catch(e) { return null; } }
+    function setSession(user) { localStorage.setItem('cerbero_session', user); }
+    function getSession() { return localStorage.getItem('cerbero_session'); }
+    function clearSession() { localStorage.removeItem('cerbero_session'); }
+
+    async function handleRegister(e) {
+      e.preventDefault();
+      var user = document.getElementById('regUser').value.trim().toLowerCase();
+      var email = document.getElementById('regEmail').value.trim().toLowerCase();
+      var pass = document.getElementById('regPass').value;
+      var confirm = document.getElementById('regConfirm').value;
+      if (pass !== confirm) { showError('regError', 'Las contraseñas no coinciden'); return; }
+      
+      try {
+        const res = await fetch('/api/auth/register/', {
+            method: 'POST', 
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username: user, email: email, password: pass })
+        });
+        const data = await res.json();
+        if (res.ok) {
+            localStorage.setItem('accessToken', data.access);
+            localStorage.setItem('refreshToken', data.refresh);
+            setSession(data.user.username);
+            showToast('Cuenta creada exitosamente');
+            document.getElementById('registerForm').reset();
+            setTimeout(function() { window.location.href = "{% url 'home' %}"; }, 800);
+        } else {
+            showError('regError', data.error || 'Error al registrar');
+        }
+      } catch(error) {
+        showError('regError', 'Error de conexión');
+      }
+    }
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      var user = document.getElementById('loginUser').value.trim().toLowerCase();
+      var pass = document.getElementById('loginPass').value;
+      var remember = document.getElementById('rememberCheck').checked;
+      
+      try {
+        const res = await fetch('/api/auth/login/', {
+            method: 'POST', 
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username: user, password: pass })
+        });
+        const data = await res.json();
+        if (res.ok) {
+            localStorage.setItem('accessToken', data.access);
+            localStorage.setItem('refreshToken', data.refresh);
+            setSession(data.user.username);
+            if (remember) { saveCredentials(user, pass); } else { clearSavedCredentials(); }
+            document.getElementById('dashUser').textContent = '@' + data.user.username;
+            showToast('Acceso concedido');
+            setTimeout(function() { window.location.href = "{% url 'home' %}"; }, 600);
+        } else {
+            showError('loginError', data.error || 'Credenciales inválidas');
+        }
+      } catch(error) {
+        showError('loginError', 'Error de conexión');
+      }
+    }
+
+    function handleRecover(e) {
+      e.preventDefault();
+      var email = document.getElementById('recoverEmail').value.trim().toLowerCase();
+      var users = getUsers();
+      var found = false;
+      for (var u in users) { if (users[u].email === email) { found = true; break; } }
+      var msgEl = document.getElementById('recoverMsg');
+      var errEl = document.getElementById('recoverError');
+      var btnWrap = document.getElementById('recoverBtnWrap');
+      if (found) {
+        msgEl.textContent = '✓ Enlace de recuperación enviado a ' + email;
+        msgEl.className = 'text-xs text-center py-3 font-mono rounded-xl bg-green-500/10 text-green-400 border border-green-500/10';
+        msgEl.classList.remove('hidden');
+        errEl.classList.add('hidden');
+        btnWrap.style.display = 'none';
+      } else {
+        showError('recoverError', 'No hay ninguna cuenta con ese email');
+      }
+    }
+
+    async function handleLogout() {
+      try {
+          const refresh = localStorage.getItem('refreshToken');
+          if (refresh) await fetch('/api/auth/logout/', { method: 'POST', body: JSON.stringify({ refresh }), headers: { 'Content-Type': 'application/json' } });
+      } catch(e) {}
+      localStorage.removeItem('accessToken'); 
+      localStorage.removeItem('refreshToken');
+      clearSession();
+      clearSavedCredentials();
+      showToast('Sesión cerrada', 'warn');
+      setTimeout(function() { window.location.href = "{% url 'index' %}"; }, 600);
+    }
+
+    (function autoLogin() {
+      var session = getSession();
+      var token = localStorage.getItem('accessToken');
+      if (session && token) {
+         window.location.href = "{% url 'home' %}";
+         return;
+      }
+      var saved = getSavedCredentials();
+      if (saved) {
+        document.getElementById('loginUser').value = saved.user;
+        document.getElementById('loginPass').value = saved.pass;
+        document.getElementById('rememberCheck').checked = true;
+      }
+      goTo('viewLogin');
+    })();
+  </script>
+</body>
+</html>
