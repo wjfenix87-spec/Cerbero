@@ -1,4 +1,31 @@
+# Django
 cerbero/media/
+cerbero/staticfiles/
 __pycache__/
 *.pyc
+*.pyo
 db.sqlite3
+*.log
+.env
+
+# Python
+venv/
+env/
+.venv/
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Build
+*.egg-info/
+dist/
+build/
+
+# Testing
+.coverage
+htmlcov/
+.pytest_cache/

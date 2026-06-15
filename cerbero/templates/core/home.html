@@ -274,30 +274,71 @@
 .expiration-selector label {
     text-shadow: 0 0 5px var(--neon-blue);
 }
+        @keyframes blackHolePulse {
+            0% { box-shadow: 0 0 20px #b026ff, inset 0 0 20px #00f3ff; transform: scale(1); }
+            50% { box-shadow: 0 0 50px #b026ff, inset 0 0 80px #00f3ff; transform: scale(0.98); }
+            100% { box-shadow: 0 0 20px #b026ff, inset 0 0 20px #00f3ff; transform: scale(1); }
+        }
+        .black-hole-active {
+            animation: blackHolePulse 0.8s infinite;
+            background: radial-gradient(circle, #050508 10%, rgba(176,38,255,0.2) 100%) !important;
+            border-color: #b026ff !important;
+        }
+
+        /* Cerberus Eyes Background */
+        .cerberus-eyes-bg {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15vw;
+            opacity: 0.15; 
+            transition: all 1s ease;
+        }
+        .features-cyber:hover .cerberus-eyes-bg {
+            opacity: 0.6;
+        }
+        .cerberus-head {
+            position: relative;
+            width: 100px; height: 50px;
+            display: flex; justify-content: center; gap: 20px;
+            animation: floatHead 6s infinite ease-in-out;
+        }
+        .cerberus-head:nth-child(1) { animation-delay: 0s; margin-top: 50px; }
+        .cerberus-head:nth-child(2) { animation-delay: -2s; margin-top: -30px; } 
+        .cerberus-head:nth-child(3) { animation-delay: -4s; margin-top: 50px; }
+        
+        .eye {
+            width: 15px; height: 8px;
+            background: #ff003c;
+            border-radius: 50%;
+            box-shadow: 0 0 20px #ff003c, 0 0 40px #ff003c;
+            animation: blink 4s infinite, twitch 10s infinite;
+        }
+        .eye-big { width: 22px; height: 12px; box-shadow: 0 0 30px #ff003c, 0 0 60px #ff003c; }
+        
+        @keyframes floatHead {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-15px) scale(1.05); }
+        }
+        @keyframes blink {
+            0%, 96%, 98%, 100% { transform: scaleY(1); }
+            97%, 99% { transform: scaleY(0.1); }
+        }
+        @keyframes twitch {
+            0%, 100% { transform: translateX(0); }
+            45% { transform: translateX(0); }
+            46% { transform: translateX(5px); }
+            48% { transform: translateX(-5px); }
+            50% { transform: translateX(0); }
+        }
     </style>
 </head>
 <body>
-    <div class="modal-overlay" id="authModal">
-    <div class="modal-cyber">
-        <span class="close-modal" onclick="closeAuthModal()">×</span>
-        <h2 id="modalTitle">ACCESO</h2>
-        <div id="loginForm">
-            <input type="text" id="loginUsername" placeholder="USUARIO">
-            <input type="password" id="loginPassword" placeholder="CONTRASEÑA">
-            <div id="loginError" class="error-message"></div>
-            <button class="btn-cyber btn-cyber-fill" onclick="handleLogin()">INGRESAR</button>
-            <div class="switch-mode" onclick="switchToRegister()">¿No tienes cuenta? Regístrate →</div>
-        </div>
-        <div id="registerForm" style="display: none;">
-            <input type="text" id="regUsername" placeholder="USUARIO">
-            <input type="email" id="regEmail" placeholder="EMAIL">
-            <input type="password" id="regPassword" placeholder="CONTRASEÑA">
-            <div id="registerError" class="error-message"></div>
-            <button class="btn-cyber btn-cyber-fill" onclick="handleRegister()">REGISTRARSE</button>
-            <div class="switch-mode" onclick="switchToLogin()">← Ya tengo cuenta</div>
-        </div>
-    </div>
-</div>
 
     <div class="bg-cyber"></div>
     <div class="grid-overlay"></div>
@@ -306,29 +347,18 @@
 
     <header class="header" id="header">
         <a href="/" class="logo-cyber" style="text-decoration: none; display: flex; align-items: center; gap: 10px;">
-            <img src="{% static 'assets/2.png' %}" alt="CERBERO" style="height: 40px; width: auto;">
+            <img src="{% static 'assets/logo_badass.png' %}" alt="CERBERO" style="height: 40px; width: auto;">
             <div class="logo-glitch">CERBERO</div>
             <span class="logo-tag">v3.0</span>
         </a>
         <nav class="nav-cyber">
             <a href="#features">Características</a>
             <a href="#demo">Cómo funciona</a>
-            <a href="#dashboard" id="dashboardLink" style="display: none;">Mis proyectos</a>
-            <a href="/profile/" id="profileLink" style="display: none;">Mi perfil</a>
             <a href="/docs/">Documentación</a>
         </nav>
         <div class="header-actions">
             <div class="matrix-toggle" id="matrixToggle">
                 <div class="matrix-toggle-knob">💊</div>
-            </div>
-            <div id="authButtons">
-                <a href="{% url 'sesion' %}?mode=register" class="btn-cyber btn-cyber-outline" style="text-decoration: none; display: inline-block;">REGISTRARSE</a>
-                <a href="{% url 'sesion' %}" class="btn-cyber btn-cyber-fill" style="text-decoration: none; display: inline-block;">INGRESAR</a>
-            </div>
-            <div id="userInfo" style="display: none;" class="user-info">
-                <img src="{% static 'assets/2.png' %}" alt="User" class="user-avatar" style="height: 35px; width: auto; border-radius: 50%;">
-                <span class="username" id="usernameDisplay"></span>
-                <span class="logout-btn" onclick="handleLogout()">🚪</span>
             </div>
         </div>
     </header>
@@ -336,16 +366,16 @@
     <section class="hero-cyber">
         <div class="hero-content-cyber">
             <div class="hero-text-cyber">
-                <div class="cyber-badge">SISTEMA OPERATIVO: ONLINE</div>
+                <div class="cyber-badge">HERRAMIENTA DE CONVERSIÓN LOCAL</div>
                 <h1 class="hero-title-cyber"><span class="line-1">El guardián</span><span class="line-2">del contexto digital</span></h1>
-                <p class="hero-subtitle-cyber"><strong>Sube tu proyecto. Comparte el enlace. La IA lo analiza completo.</strong></p>
+                <p class="hero-subtitle-cyber"><strong>Arrastra tu proyecto. Recibe el texto al instante. Dale a la IA el código puro que necesita.</strong></p>
                 <div class="hero-cta-cyber">
-                    <button class="btn-cyber btn-cyber-outline btn-cyber-large" id="docsBtn">📖 Ver documentación</button>
+                    <button class="btn-cyber btn-cyber-fill btn-cyber-large" onclick="window.scrollTo({top: document.getElementById('uploadZone').offsetTop, behavior: 'smooth'})">⚡ Convertir Proyecto Ahora</button>
                 </div>
-                <div class="hero-stats-cyber">
-                    <div class="stat-cyber"><div class="stat-value-cyber">∞</div><div class="stat-label-cyber">Proyectos ilimitados</div></div>
-                    <div class="stat-cyber"><div class="stat-value-cyber">0</div><div class="stat-label-cyber">Costo inicial</div></div>
-                    <div class="stat-cyber"><div class="stat-value-cyber">100MB</div><div class="stat-label-cyber">Máx por archivo</div></div>
+                <div class="hero-stats-cyber" style="margin-top: 30px;">
+                    <div class="stat-cyber"><div class="stat-value-cyber">∞</div><div class="stat-label-cyber">Conversiones Ilimitadas</div></div>
+                    <div class="stat-cyber"><div class="stat-value-cyber">0</div><div class="stat-label-cyber">Bases de datos</div></div>
+                    <div class="stat-cyber"><div class="stat-value-cyber">⚡</div><div class="stat-label-cyber">Fricción Cero</div></div>
                 </div>
             </div>
             <div class="hologram-terminal">
@@ -355,27 +385,16 @@
                     <div class="terminal-dot-cyber green"></div>
                 </div>
                 <div class="terminal-body-cyber">
-                    <div class="cmd-prompt">$ <span class="cmd-input">cerbero upload --recursive</span></div>
+                    <div class="cmd-prompt">$ <span class="cmd-input">cerbero extract ./mi-proyecto > prompt.txt</span></div>
                     <div class="file-tree" id="fileTreePreview">
-                        <div class="tree-item"><span class="file-name">📁 src/</span><span class="file-size">[DIRECTORIO]</span></div>
-                        <div class="tree-item"><span class="file-name">  ├─ app.js</span><span class="file-size">45.1 KB</span></div>
-                        <div class="tree-item"><span class="file-name">  ├─ styles.css</span><span class="file-size">8.2 KB</span></div>
-                        <div class="tree-item"><span class="file-name">  └─ index.html</span><span class="file-size">12.4 KB</span></div>
+                        <div class="tree-item"><span class="file-name">📁 mi-proyecto/</span><span class="file-size">[ANALIZANDO]</span></div>
+                        <div class="tree-item"><span class="file-name" style="color: #00ff9d;">  ├─ app.py</span><span class="file-size">Aceptado</span></div>
+                        <div class="tree-item"><span class="file-name" style="color: #ff4444;">  ├─ venv/</span><span class="file-size">Ignorado</span></div>
+                        <div class="tree-item"><span class="file-name" style="color: #00ff9d;">  └─ index.html</span><span class="file-size">Aceptado</span></div>
                     </div>
-                    <div class="progress-cyber"><div class="progress-fill-cyber" id="progressFill"></div></div>
-                    <div class="success-cyber" id="successMessage" style="display: none;"><span>✓</span> ENCRIPTACIÓN COMPLETADA — ENLACE GENERADO</div>
-                    <div class="link-generated" id="linkGenerated" style="display: none;">
-                        <div class="link-box">
-                        <span class="link-url-cyber" id="generatedLink">🔒 https://cerbero.com/p/</span>
-                        <button class="link-btn" onclick="copyLink('normal')">📋copiar</button>
-                        </div>
-                        <div class="link-box" id="iaLinkBox" style="display: none;">
-                            <span class="link-url-cyber" id="generatedIaLink">🤖 https://cerbero.com/p/?mode=ia</span>
-                            <button class="link-btn" onclick="copyLink('ia')">📋copiar para la IA</button>
-                            <span style="color: var(--neon-blue); cursor: pointer;" onclick="copyLink()">[COPIAR]</span>
-                        </div>
-                        
-                    </div>
+                    <div class="progress-cyber"><div class="progress-fill-cyber" id="progressFill" style="width: 100%;"></div></div>
+                    <div class="success-cyber" id="successMessage" style="display: flex; margin-top: 15px;"><span>✓</span> EXTRACCIÓN COMPLETADA — DESCARGANDO .TXT</div>
+                    <div class="link-generated" id="linkGenerated" style="display: none;"></div>
                 </div>
             </div>
         </div>
@@ -386,12 +405,12 @@
         <!-- PROTOCOLO ARRIBA (FULL WIDTH) -->
         <div style="text-align: center; margin-bottom: 60px;">
             <span class="section-tag-cyber">:: PROTOCOLO ::</span>
-            <h3 style="font-family: 'Space Grotesk', sans-serif; font-size: 2rem; margin: 20px 0;">Sube. Comparte. Resuelve.<br>En ese orden.</h3>
-            <p style="color: rgba(255,255,255,0.6); max-width: 700px; margin: 0 auto 30px;">Cerbero actúa como el puente cuántico entre tu entorno local y las IAs más potentes del planeta. Tu código nunca toca servidores permanentes: existe solo como contexto temporal.</p>
+            <h3 style="font-family: 'Space Grotesk', sans-serif; font-size: 2rem; margin: 20px 0;">Arrastra. Extrae. Resuelve.<br>En ese orden.</h3>
+            <p style="color: rgba(255,255,255,0.6); max-width: 700px; margin: 0 auto 30px;">Cerbero extrae el código puro de tu proyecto local para que las IAs lo entiendan a la perfección. Todo el proceso ocurre en tu navegador, garantizando privacidad absoluta.</p>
             <div style="display: flex; justify-content: center; gap: 50px; flex-wrap: wrap;">
-                <div><strong style="color: #00f3ff; font-size: 1.5rem;">1️⃣</strong><br>Arrastra o selecciona</div>
-                <div><strong style="color: #00f3ff; font-size: 1.5rem;">2️⃣</strong><br>Encriptación automática</div>
-                <div><strong style="color: #00f3ff; font-size: 1.5rem;">3️⃣</strong><br>Comparte con cualquier IA</div>
+                <div><strong style="color: #00f3ff; font-size: 1.5rem;">1️⃣</strong><br>Arrastra tu carpeta</div>
+                <div><strong style="color: #00f3ff; font-size: 1.5rem;">2️⃣</strong><br>Filtro inteligente automático</div>
+                <div><strong style="color: #00f3ff; font-size: 1.5rem;">3️⃣</strong><br>Pégalo en cualquier IA</div>
             </div>
         </div>
 
@@ -406,411 +425,124 @@
 
             <!-- Fila horizontal: arrastre + botones + expiración -->
             <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap; margin-bottom: 30px;">
-                <div style="flex: 2; min-width: 200px; background: rgba(0,0,0,0.3); border: 2px dashed rgba(0,243,255,0.4); border-radius: 14px; padding: 14px 20px; text-align: center;">
-                    <div style="font-size: 28px;">📁 📂 🗂️</div>
-                    <p style="font-size: 13px; font-weight: 600; margin: 0;">Arrastra CARPETA o ZIP</p>
-                    <small style="font-size: 10px; opacity: 0.6;">Proyectos pequeños / grandes</small>
+                <div style="flex: 1; min-width: 200px; background: rgba(0,0,0,0.3); border: 2px dashed rgba(0,243,255,0.4); border-radius: 14px; padding: 30px 20px; text-align: center; transition: all 0.3s ease;" class="hover-glow">
+                    <div style="font-size: 32px; margin-bottom: 10px;">📁</div>
+                    <p style="font-size: 16px; font-weight: 600; margin: 0; color: #fff;">Arrastra tu CARPETA o Haz Clic Aquí</p>
+                    <small style="font-size: 12px; opacity: 0.6; color: #00f3ff;">Proyectos pequeños o inmensos</small>
                 </div>
-                <div style="display: flex; gap: 12px;">
-                    <button id="uploadFolderBtn" style="background: rgba(255,255,255,0.05); color: #e0e0e0; border: 1px solid rgba(255,255,255,0.15); padding: 12px 22px; border-radius: 10px; cursor: pointer;">📁 Subir Carpeta</button>
-                    <button id="uploadZipBtn" style="background: linear-gradient(135deg, #00f3ff, #b026ff); color: #fff; border: none; padding: 12px 22px; border-radius: 10px; cursor: pointer;">📦 Subir ZIP</button>
-                </div>
-                <div style="display: flex; align-items: center; gap: 8px; background: rgba(0,0,0,0.3); padding: 8px 16px; border-radius: 40px;">
-                    <span>⏱️</span>
-                    <select id="expirationSelect" style="background: #12121a; border: 1px solid rgba(0,243,255,0.3); color: #fff; padding: 6px 10px; border-radius: 20px; cursor: pointer;">
-                        <option value="">Nunca</option>
-                        <option value="24">24h</option>
-                        <option value="168">7d</option>
-                        <option value="720">30d</option>
-                    </select>
-                </div>
+            </div>
             </div>
 
             <!-- Estado de subida -->
             <div id="uploadStatus" style="margin-bottom: 25px; text-align: center; color: #00ff9d; font-family: monospace;"></div>
 
-            <!-- FRAMEWORKS + LENGUAJE + HISTORIAL (3 COLUMNAS HORIZONTALES) -->
-            <div style="display: flex; gap: 25px; flex-wrap: wrap; justify-content: space-between; border-top: 1px solid rgba(0,243,255,0.1); padding-top: 25px;">
-                
-                <!-- Frameworks -->
-                <div style="flex: 2; min-width: 250px;">
-                    <h4 style="margin: 0 0 12px 0; color: #00f3ff;">🎓 ¿Qué necesitas saber? Cerbero te guía</h4>
-                    <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-                        <a href="/upload-guide/django/" class="btn-cyber btn-cyber-outline" style="padding: 6px 14px; font-size: 12px; text-decoration: none;">🐍 Django</a>
-                        <a href="/upload-guide/flutter/" class="btn-cyber btn-cyber-outline" style="padding: 6px 14px; font-size: 12px; text-decoration: none;">📱 Flutter</a>
-                        <a href="/upload-guide/react/" class="btn-cyber btn-cyber-outline" style="padding: 6px 14px; font-size: 12px; text-decoration: none;">⚛️ React</a>
-                        <a href="/upload-guide/angular/" class="btn-cyber btn-cyber-outline" style="padding: 6px 14px; font-size: 12px; text-decoration: none;">🅰️ Angular</a>
-                        <a href="/upload-guide/vue/" class="btn-cyber btn-cyber-outline" style="padding: 6px 14px; font-size: 12px; text-decoration: none;">💚 Vue.js</a>
-                        <a href="/upload-guide/node/" class="btn-cyber btn-cyber-outline" style="padding: 6px 14px; font-size: 12px; text-decoration: none;">🟢 Node.js</a>
-                        <a href="/upload-guide/spring/" class="btn-cyber btn-cyber-outline" style="padding: 6px 14px; font-size: 12px; text-decoration: none;">🍃 Spring Boot</a>
-                        <a href="/upload-guide/laravel/" class="btn-cyber btn-cyber-outline" style="padding: 6px 14px; font-size: 12px; text-decoration: none;">🔴 Laravel</a>
-                        <a href="/upload-guide/html/" class="btn-cyber btn-cyber-outline" style="padding: 6px 14px; font-size: 12px; text-decoration: none;">📄 HTML/CSS/JS</a>
-                    </div>
-                </div>
 
-                <!-- Lenguaje -->
-                <div style="flex: 1; min-width: 180px;">
-                    <h4 style="margin: 0 0 12px 0; color: #00ff9d;">📝 ¿En qué lenguaje está tu proyecto?</h4>
-                    <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-                        <button onclick="selectLanguage('python')" class="lang-btn" style="background: #12121a; border: 1px solid #00f3ff; padding: 6px 12px; border-radius: 20px; cursor: pointer;">🐍 Python</button>
-                        <button onclick="selectLanguage('javascript')" class="lang-btn" style="background: #12121a; border: 1px solid #00f3ff; padding: 6px 12px; border-radius: 20px; cursor: pointer;">📜 JS</button>
-                        <button onclick="selectLanguage('java')" class="lang-btn" style="background: #12121a; border: 1px solid #00f3ff; padding: 6px 12px; border-radius: 20px; cursor: pointer;">☕ Java</button>
-                        <button onclick="selectLanguage('dart')" class="lang-btn" style="background: #12121a; border: 1px solid #00f3ff; padding: 6px 12px; border-radius: 20px; cursor: pointer;">🎯 Dart</button>
-                    </div>
-                    <div id="selectedLanguage" style="margin-top: 12px; display: none; padding: 8px; background: #0a0a0f; border-radius: 8px;">
-                        <span id="langDisplay"></span>
-                        <button onclick="copyLanguagePrompt()" style="margin-left: 10px; background: #00ff9d; border: none; padding: 4px 12px; border-radius: 6px; cursor: pointer;">📋 Copiar</button>
-                    </div>
-                </div>
-
-                <!-- Historial -->
-                <div style="flex: 1; min-width: 180px;">
-                    <h4 style="margin: 0 0 12px 0; color: #00f3ff;">📜 Proyectos recientes</h4>
-                    <div id="recentProjectsList" style="background: #0a0a0f; border-radius: 8px; padding: 8px; max-height: 150px; overflow-y: auto;">
-                        <p style="color: #888; text-align: center;">No has visitado ningún proyecto aún.</p>
-                    </div>
-                    <button onclick="clearRecentProjects()" style="margin-top: 10px; background: transparent; border: 1px solid #ff4444; color: #ff4444; padding: 4px 12px; border-radius: 6px; cursor: pointer;">🗑️ Limpiar historial</button>
-                </div>
-            </div>
         </div>
     </div>
 </section> 
 
-    <section class="dashboard-section" id="dashboard">
-        <div class="section-header-cyber">
-            <span class="section-tag-cyber">:: MIS_PROYECTOS ::</span>
-            <h2 class="section-title-cyber">Tus proyectos guardados</h2>
-            <p class="section-desc-cyber">Todos tus proyectos en un solo lugar. Accede a ellos cuando quieras.</p>
-        </div>
-        <div class="projects-grid" id="projectsGrid">
-            <div style="text-align: center; grid-column: 1/-1; color: rgba(255,255,255,0.5);"></div>
-        </div>
-    </section>
 
-    <div class="marquee-section"><div class="marquee-track"><div class="marquee-item"><span>⚡</span> 100% GRATIS</div><div class="marquee-item"><span>💳</span> SIN TARJETAS</div><div class="marquee-item"><span>🔒</span> ENCRIPTADO</div><div class="marquee-item"><span>🌐</span> ENLACE ÚNICO</div><div class="marquee-item"><span>🤖</span> IA READY</div><div class="marquee-item"><span>⚡</span> 100% GRATIS</div><div class="marquee-item"><span>💳</span> SIN TARJETAS</div><div class="marquee-item"><span>🔒</span> ENCRIPTADO</div><div class="marquee-item"><span>🌐</span> ENLACE ÚNICO</div><div class="marquee-item"><span>🤖</span> IA READY</div></div></div>
+    <div class="marquee-section"><div class="marquee-track"><div class="marquee-item"><span>⚡</span> 100% GRATIS</div><div class="marquee-item"><span>💻</span> PROCESAMIENTO LOCAL</div><div class="marquee-item"><span>🔒</span> 100% PRIVADO</div><div class="marquee-item"><span>🚫</span> SIN SERVIDORES</div><div class="marquee-item"><span>🤖</span> IA READY</div><div class="marquee-item"><span>⚡</span> 100% GRATIS</div><div class="marquee-item"><span>💻</span> PROCESAMIENTO LOCAL</div><div class="marquee-item"><span>🔒</span> 100% PRIVADO</div><div class="marquee-item"><span>🚫</span> SIN SERVIDORES</div><div class="marquee-item"><span>🤖</span> IA READY</div></div></div>
 
-    <section class="features-cyber" id="features">
-        <div class="section-header-cyber"><span class="section-tag-cyber">:: SOPORTE_TECNOLÓGICO ::</span><h2 class="section-title-cyber">Formatos compatibles</h2><p class="section-desc-cyber">Si tu IA lo necesita, Cerbero lo transporta.</p></div>
-        <div class="features-grid-cyber" id="featuresGrid"></div>
+    <section class="features-cyber" id="features" style="position: relative; overflow: hidden;">
+        <!-- OJOS EN LA OSCURIDAD -->
+        <div class="cerberus-eyes-bg">
+            <div class="cerberus-head" style="transform: rotate(-10deg);"><div class="eye"></div><div class="eye"></div></div>
+            <div class="cerberus-head"><div class="eye eye-big"></div><div class="eye eye-big"></div></div>
+            <div class="cerberus-head" style="transform: rotate(10deg);"><div class="eye"></div><div class="eye"></div></div>
+        </div>
+        
+        <div class="section-header-cyber" style="position: relative; z-index: 1;"><span class="section-tag-cyber">:: ARQUITECTURA DIRECTA ::</span><h2 class="section-title-cyber">El poder de la fricción cero</h2><p class="section-desc-cyber">Diseñado para desarrolladores que no tienen tiempo que perder.</p></div>
+        <div class="features-grid-cyber" id="featuresGrid" style="position: relative; z-index: 1;"></div>
     </section>
 
     <div class="quote-wow">
-        <div class="quote-header"><span class="quote-icon"><img src="{% static 'assets/2.png' %}" alt="CERBERO" style="height: 16px; width: auto; vertical-align: middle;"></span><span class="quote-author">Cerbero, el guardián</span></div>
-        <div class="quote-text">"Las IAs no pueden acceder a tu PC por <span class="quote-highlight">políticas de privacidad</span>...<br>pero Cerbero <span class="quote-highlight">les pasa el mensaje</span>. Tú solo comparte el enlace único."</div>
+        <div class="quote-header"><span class="quote-icon"><img src="{% static 'assets/logo_badass.png' %}" alt="CERBERO" style="height: 16px; width: auto; vertical-align: middle;"></span><span class="quote-author">Cerbero, el guardián</span></div>
+        <div class="quote-text">"Las IAs necesitan contexto y código puro para ayudarte a programar...<br>Cerbero convierte todo tu proyecto en el <span class="quote-highlight">prompt perfecto</span> en milisegundos."</div>
     </div>
 
-    <div class="badges"><span class="badge"><span>⚡</span> 100% GRATIS</span><span class="badge"><span>💳</span> SIN TARJETAS</span><span class="badge"><span>🚫</span> SIN LÍMITES TONTOS</span><span class="badge"><span>🔒</span> PRIVACIDAD CONTROLADA</span><span class="badge"><span>🌐</span> ENLACE ÚNICO</span></div>
+    <div class="badges"><span class="badge"><span>⚡</span> 100% GRATIS</span><span class="badge"><span>💻</span> DIRECTO A TU PC</span><span class="badge"><span>🚫</span> SIN LÍMITES DE TAMAÑO</span><span class="badge"><span>🔒</span> 100% PRIVADO</span></div>
 
-    <section class="cta-final">
-        <div class="cta-box"><h2>Listo para liberar<br>el potencial de tus IAs?</h2><p>Únete a la revolución. Sube tu primer proyecto gratis, sin tarjetas, sin compromisos.</p><div class="cta-buttons-final">
-    </section>
 
     <footer class="footer-cyber">
         <div class="footer-grid">
-            <div class="footer-brand"><div class="logo-glitch" style="font-size: 1.5rem; display: flex; align-items: center; gap: 8px;"><img src="{% static 'assets/2.png' %}" alt="CERBERO" style="height: 30px; width: auto;"> CERBERO</div><p>El guardián del contexto digital. Rompiendo barreras entre tu código y las IAs desde 2026.</p></div>
-            <div class="footer-links"><h4>Recursos</h4><ul><li><a href="#">Documentación</a></li><li><a href="#">Soporte</a></li></ul></div>
-            <div class="footer-links"><h4>Legal</h4><ul><li><a href="/privacy/">Privacidad</a></li><li><a href="/terms/">Términos</a></li><li><a href="/cookies/">Cookies</a></li></ul></div>
+            <div class="footer-brand"><div class="logo-glitch" style="font-size: 1.5rem; display: flex; align-items: center; gap: 8px;"><img src="{% static 'assets/logo_badass.png' %}" alt="CERBERO" style="height: 30px; width: auto;"> CERBERO</div><p>El guardián del contexto digital. Fricción cero entre tu código y las IAs.</p></div>
+            <div class="footer-links"><h4>Recursos</h4><ul><li><a href="/docs/">Documentación</a></li></ul></div>
         </div>
-        <div class="footer-bottom-cyber"><div class="footer-copyright">© 2026 Cerbero · Todos los derechos guardados</div><div class="social-cyber"><a href="#" class="social-btn-cyber">🐙</a><a href="#" class="social-btn-cyber">𝕏</a><a href="#" class="social-btn-cyber">💬</a></div></div>
+        <div class="footer-bottom-cyber"><div class="footer-copyright">© 2026 Cerbero · Todo local, todo privado.</div></div>
     </footer>
 
     <script>
-        // Verificar sesión al cargar home
-        (function() {
-            var session = localStorage.getItem('cerbero_session');
-            var token = localStorage.getItem('accessToken');
-            
-            // Si no hay sesión, redirigir al index
-            if (!session || !token) {
-                window.location.href = "{% url 'index' %}";
-                return;
-            }
-        })();
-        
-        let accessToken = localStorage.getItem('accessToken');
-        let currentUser = null;
 
-        async function handleLogin() {
-            const username = document.getElementById('loginUsername').value;
-            const password = document.getElementById('loginPassword').value;
-            const errorDiv = document.getElementById('loginError');
-            try {
-                const res = await fetch('/api/auth/login/', {
-                    method: 'POST', 
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, password })
-                });
-                const data = await res.json();
-                if (res.ok) {
-                    localStorage.setItem('accessToken', data.access);
-                    localStorage.setItem('refreshToken', data.refresh);
-                    accessToken = data.access;
-                    currentUser = data.user;
-                    updateUIAfterLogin();
-                    document.getElementById('profileLink').style.display = 'block';
-                    closeAuthModal();
-                    loadUserProjects();
-                } else { errorDiv.textContent = data.error || 'Error'; }
-            } catch(e) { errorDiv.textContent = 'Error de conexión: ' + e.message; }
-        }
-
-        async function handleRegister() {
-            const username = document.getElementById('regUsername').value;
-            const email = document.getElementById('regEmail').value;
-            const password = document.getElementById('regPassword').value;
-            const errorDiv = document.getElementById('registerError');
-            try {
-                const res = await fetch('/api/auth/register/', {
-                    method: 'POST', 
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, email, password })
-                });
-                const data = await res.json();
-                if (res.ok) {
-                    localStorage.setItem('accessToken', data.access);
-                    localStorage.setItem('refreshToken', data.refresh);
-                    accessToken = data.access;
-                    currentUser = data.user;
-                    updateUIAfterLogin();
-                    closeAuthModal();
-                    loadUserProjects();
-                } else { errorDiv.textContent = data.error || 'Error'; }
-            } catch(e) { errorDiv.textContent = 'Error de conexión: ' + e.message; }
-        }
-
-        async function handleLogout() {
-            try {
-                const refresh = localStorage.getItem('refreshToken');
-                if (refresh) await fetch('/api/auth/logout/', { method: 'POST', body: JSON.stringify({ refresh }), headers: { 'Content-Type': 'application/json' } });
-            } catch(e) {}
-            localStorage.removeItem('accessToken'); localStorage.removeItem('refreshToken');
-            accessToken = null; currentUser = null;
-            updateUIAfterLogout();
-            document.getElementById('profileLink').style.display = 'none';
-        }
-
-        function updateUIAfterLogin() {
-            document.getElementById('authButtons').style.display = 'none';
-            document.getElementById('userInfo').style.display = 'flex';
-            document.getElementById('usernameDisplay').textContent = currentUser.username;
-            document.getElementById('dashboardLink').style.display = 'block';
-        }
-
-        function updateUIAfterLogout() {
-            document.getElementById('authButtons').style.display = 'flex';
-            document.getElementById('userInfo').style.display = 'none';
-            document.getElementById('dashboardLink').style.display = 'none';
-            document.getElementById('projectsGrid').innerHTML = '<div style="text-align: center; grid-column: 1/-1; color: rgba(255,255,255,0.5);">Inicia sesión para ver tus proyectos</div>';
-        }
-
-        async function loadUserProjects() {
-            if (!accessToken) return;
-            try {
-                const res = await fetch('/p/api/my-projects/', { headers: { 'Authorization': `Bearer ${accessToken}` } });
-                const data = await res.json();
-                const grid = document.getElementById('projectsGrid');
-                if (data.projects && data.projects.length) {
-                    grid.innerHTML = data.projects.map(p => `
-                        <div class="project-card">
-                            <h3>📁 ${p.title}</h3>
-                            <div class="project-slug">${p.slug}</div>
-                            <div class="project-stats"><span>📄 ${p.files_count} archivos</span><span>👁️ ${p.views} vistas</span><span>📅 ${new Date(p.created_at).toLocaleDateString()}</span></div>
-                            <div class="project-actions"><button class="edit-btn" onclick="editProject('${p.slug}')">✏️ Editar</button><a href="${p.url}" class="view-btn">Ver</a><button class="delete-btn" onclick="deleteProject('${p.slug}')">🗑️ Eliminar</button></div>
-                        </div>
-                    `).join('');
-                } else { grid.innerHTML = '<div style="text-align: center; grid-column: 1/-1;">No tienes proyectos aún. ¡Sube tu primer proyecto!</div>'; }
-            } catch(e) { console.error(e); }
-        }
-
-        async function editProject(slug) {
-            const title = prompt('Nuevo título:');
-            if (!title) return;
-            try {
-                await fetch(`/p/${slug}/update/`, { method: 'PUT', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${accessToken}` }, body: JSON.stringify({ title }) });
-                loadUserProjects();
-            } catch(e) { alert('Error'); }
-        }
-
-        async function deleteProject(slug) {
-            if (!confirm('¿Eliminar proyecto?')) return;
-            try {
-                await fetch(`/p/${slug}/delete/`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${accessToken}` } });
-                loadUserProjects();
-            } catch(e) { alert('Error'); }
-        }
-
-        function openAuthModal(mode = 'login') {
-    const modal = document.getElementById('authModal');
-    const loginForm = document.getElementById('loginForm');
-    const registerForm = document.getElementById('registerForm');
-    const modalTitle = document.getElementById('modalTitle');
-    
-    if (mode === 'register') {
-        loginForm.style.display = 'none';
-        registerForm.style.display = 'block';
-        modalTitle.textContent = 'REGISTRO';
-    } else {
-        loginForm.style.display = 'block';
-        registerForm.style.display = 'none';
-        modalTitle.textContent = 'ACCESO';
-    }
-    
-    modal.classList.add('active');
-}
-        function closeAuthModal() { 
-            document.getElementById('authModal').classList.remove('active'); 
-        }
-        function switchToRegister() { 
-            document.getElementById('loginForm').style.display = 'none'; 
-            document.getElementById('registerForm').style.display = 'block'; 
-            document.getElementById('modalTitle').textContent = 'REGISTRO'; 
-        }
-        function switchToLogin() { 
-            document.getElementById('registerForm').style.display = 'none'; 
-            document.getElementById('loginForm').style.display = 'block'; 
-            document.getElementById('modalTitle').textContent = 'ACCESO'; 
-        }
-
-        function copyLink(type) {
-        const link = type === 'ia' 
-        ? document.getElementById('generatedIaLink').innerText.replace('🤖 ', '')
-        : document.getElementById('generatedLink').innerText.replace('🔒 ', '');
-    navigator.clipboard.writeText(link);
-    alert(type === 'ia' ? '🤖 Enlace IA copiado' : '🔗 Enlace copiado');
-}
-
-        // ==================== ZONA DE TRANSFERENCIA ====================
-        const fileInput = document.createElement('input');
-        fileInput.type = 'file';
-        fileInput.multiple = true;
-        fileInput.style.display = 'none';
-        document.body.appendChild(fileInput);
-        
-        async function uploadFiles(files) {
-            if (!files.length) return;
-            const formData = new FormData();
-            for (let f of files) {
-                formData.append('files', f);
-            }
-            
-            const expirationSelect = document.getElementById('expirationSelect');
-            if (expirationSelect && expirationSelect.value) {
-                formData.append('expiration', expirationSelect.value);
-            }
-            
-            if (accessToken) {
-                formData.append('user', currentUser?.id);
-            }
-            
-            const statusDiv = document.getElementById('uploadStatus');
-            if (statusDiv) statusDiv.textContent = '📤 Subiendo archivos...';
-            
-            try {
-                const res = await fetch('/p/api/upload/', {
-                    method: 'POST',
-                    body: formData,
-                    headers: accessToken ? { 'Authorization': `Bearer ${accessToken}` } : {}
-                });
-                const data = await res.json();
-                
-                if (data.success) {
-                    if (statusDiv) statusDiv.innerHTML = `✅ Subidos ${data.count} archivos correctamente`;
-                    document.getElementById('successMessage').style.display = 'flex';
-                    const fullUrl = `${window.location.origin}${data.url}`;
-                    const iaUrl = `${fullUrl}?mode=ia`;
-                    document.getElementById('generatedLink').innerHTML = `🔗 Enlace normal ${fullUrl}<br> Enlace IA: ${iaUrl}`;
-                    document.getElementById('linkGenerated').style.display = 'flex';
-                    setTimeout(() => window.location.href = data.url, 2000);
-                } else {
-                    if (statusDiv) statusDiv.innerHTML = `❌ Error: ${data.error}`;
-                }
-            } catch(error) {
-                if (statusDiv) statusDiv.innerHTML = '❌ Error de conexión';
-            }
-        }
-        
-        function triggerUpload() {
-            fileInput.click();
-        }
-        
         const uploadZone = document.getElementById('uploadZone');
         if (uploadZone) {
-            uploadZone.addEventListener('click',(e)=>{
-                if (e.target.closest('.expiration-selector')) {
-                    return;
+                       const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            function playSciFiSound(type) {
+                if(audioCtx.state === 'suspended') audioCtx.resume();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                
+                if (type === 'hover') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.1);
+                    gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+                    osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+                } else if (type === 'success') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(440, audioCtx.currentTime);
+                    osc.frequency.setValueAtTime(660, audioCtx.currentTime + 0.1);
+                    osc.frequency.setValueAtTime(880, audioCtx.currentTime + 0.2);
+                    gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.5);
+                    osc.start(); osc.stop(audioCtx.currentTime + 0.5);
+                } else if (type === 'error') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(100, audioCtx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(50, audioCtx.currentTime + 0.3);
+                    gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
+                    osc.start(); osc.stop(audioCtx.currentTime + 0.3);
                 }
-                    if (!e.target.closest('#uploadFolderBtn') && !e.target.closest('#uploadZipBtn')) {
-        return;
-    }
-    // Si llegamos aquí, fue clic en un botón → activar la subida correspondiente
-    if (e.target.closest('#uploadFolderBtn')) {
-        folderInput.click();
-    } else if (e.target.closest('#uploadZipBtn')) {
-        zipInput.click();
-    }
+            }
+
+            uploadZone.addEventListener('click', () => {
+                folderInput.click();
             });
-            
-            fileInput.onchange = (e) => {
-                uploadFiles(Array.from(e.target.files));
-                fileInput.value = '';
-            };
-            
+
+            let lastHoverSound = 0;
             uploadZone.addEventListener('dragover', (e) => {
                 e.preventDefault();
-                uploadZone.style.borderColor = 'var(--neon-blue)';
-                uploadZone.style.background = 'rgba(0, 243, 255, 0.1)';
+                uploadZone.classList.add('black-hole-active');
+                if (Date.now() - lastHoverSound > 800) { playSciFiSound('hover'); lastHoverSound = Date.now(); }
             });
             
             uploadZone.addEventListener('dragleave', () => {
-                uploadZone.style.borderColor = 'rgba(0, 243, 255, 0.3)';
-                uploadZone.style.background = 'var(--dark-3)';
+                uploadZone.classList.remove('black-hole-active');
             });
             
             uploadZone.addEventListener('drop', (e) => {
                 e.preventDefault();
-                uploadZone.style.borderColor = 'rgba(0, 243, 255, 0.3)';
-                uploadZone.style.background = 'var(--dark-3)';
-                uploadFiles(Array.from(e.dataTransfer.files));
+                uploadZone.classList.remove('black-hole-active');
+                uploadFolder(Array.from(e.dataTransfer.files));
             });
             
-            console.log('✅ Zona de transferencia activada');
+            console.log('✅ Zona de transferencia Modo Dios activada');
         }
         
-        document.getElementById('openUploadBtn')?.addEventListener('click', triggerUpload);
-        document.getElementById('ctaUploadBtn')?.addEventListener('click', triggerUpload);
+        document.getElementById('openUploadBtn')?.addEventListener('click', () => folderInput.click());
+        document.getElementById('ctaUploadBtn')?.addEventListener('click', () => folderInput.click());
         
         function init() {
-            if (accessToken && accessToken !== 'null' && accessToken !== 'undefined') {
-                fetch('/api/auth/me/', { headers: { 'Authorization': `Bearer ${accessToken}` } })
-                .then(r => {
-                    if (!r.ok) throw new Error("Unauthorized");
-                    return r.json();
-                })
-                .then(u => { 
-                    if (u.id) { 
-                        currentUser = u; 
-                        updateUIAfterLogin(); 
-                        loadUserProjects(); 
-                    } 
-                })
-                .catch(() => { 
-                    localStorage.removeItem('accessToken'); 
-                    localStorage.removeItem('refreshToken'); 
-                    accessToken = null; 
-                    currentUser = null;
-                });
-            }
-            const featuresGrid = document.getElementById('featuresGrid');
             if (featuresGrid) {
                 featuresGrid.innerHTML = [
-                    { icon: '💻', title: 'Código fuente', ext: '.js .ts .py .go .rs .java', desc: 'Syntax highlighting' },
-                    { icon: '🎨', title: 'Diseño UI/UX', ext: '.fig .sketch .xd .svg', desc: 'Extracción de componentes' },
-                    { icon: '🗄️', title: 'Base de datos', ext: '.sql .prisma .mongo', desc: 'Esquemas y queries' },
-                    { icon: '🐛', title: 'Debugging', ext: '.log .stack .crash', desc: 'Análisis de errores' },
-                    { icon: '📦', title: 'Proyectos ZIP', ext: '.zip .tar .rar', desc: 'Hasta 100MB' },
-                    { icon: '⚙️', title: 'Configuración', ext: '.json .yml .env', desc: 'Variables de entorno' },
-                    { icon: '📝', title: 'Documentación', ext: '.md .rst .txt .pdf', desc: 'Specs y READMEs' },
-                    { icon: '🔐', title: 'Modo Stealth', ext: 'AUTO_DESTRUCT', desc: 'Enlaces de un solo uso' }
+                    { icon: '💻', title: 'Código Puro', ext: '.js .py .java .ts...', desc: 'Extrae solo el texto útil para la IA' },
+                    { icon: '🧹', title: 'Filtro Inteligente', ext: 'NO venv NO node_modules', desc: 'Ignora basura y dependencias pesadas' },
+                    { icon: '🔒', title: '100% Privado', ext: 'PROCESAMIENTO LOCAL', desc: 'El archivo se genera directo en tu PC' },
+                    { icon: '⚡', title: 'Velocidad Absoluta', ext: 'DRAG & DROP', desc: 'Arrastra tu proyecto crudo sin comprimir' }
                 ].map(f => `<div class="feature-card-cyber"><div class="feature-icon-cyber">${f.icon}</div><h3 class="feature-title-cyber">${f.title}</h3><div class="feature-ext-cyber">${f.ext}</div><p class="feature-desc-cyber">${f.desc}</p></div>`).join('');
             }
             const matrixToggle = document.getElementById('matrixToggle');
@@ -847,116 +579,109 @@ folderInput.directory = true;
 folderInput.style.display = 'none';
 document.body.appendChild(folderInput);
 
-// ==================== SUBIR ZIP ====================
-const zipInput = document.createElement('input');
-zipInput.type = 'file';
-zipInput.accept = '.zip,.rar,.7z';
-zipInput.style.display = 'none';
-document.body.appendChild(zipInput);
+
 
 // Función para subir carpeta
 async function uploadFolder(files) {
     if (!files.length) return;
     
+    let projectName = "cerbero_proyecto";
+    if (files.length > 0 && files[0].webkitRelativePath) {
+        const parts = files[0].webkitRelativePath.split('/');
+        if (parts.length > 0 && parts[0]) {
+            projectName = parts[0];
+        }
+    }
+    
     const formData = new FormData();
+    let addedCount = 0;
+    
+    // Lista básica de carpetas y archivos a ignorar en el frontend para no saturar el servidor
+    const ignorePatterns = [
+        '/node_modules/', '\\node_modules\\', '/venv/', '/.venv/', '/env/', '/.env',
+        '/.git/', '/__pycache__/', '/.idea/', '/.vscode/', '/.next/', '/.nuxt/',
+        '/dist/', '/build/', '/out/', '/target/', '/bin/', '/obj/',
+        '.exe', '.dll', '.so', '.dylib', '.pyc', '.pyo', '.pyd',
+        '.jpg', '.jpeg', '.png', '.gif', '.ico', '.webp', '.mp4', '.mp3', '.pdf', '.zip', '.rar', '.tar', '.gz'
+    ];
+    
     for (let file of files) {
-        // Guardar la ruta relativa para mantener estructura
         const relativePath = file.webkitRelativePath || file.name;
-        formData.append('files', file);
-        formData.append('paths', relativePath);
+        
+        let shouldIgnore = false;
+        for (let pattern of ignorePatterns) {
+            if (relativePath.includes(pattern) || relativePath.endsWith(pattern)) {
+                shouldIgnore = true;
+                break;
+            }
+        }
+        
+        if (!shouldIgnore) {
+            formData.append('files', file);
+            formData.append('paths', relativePath);
+            addedCount++;
+        }
     }
     
-    const expirationSelect = document.getElementById('expirationSelect');
-    if (expirationSelect && expirationSelect.value) {
-        formData.append('expiration', expirationSelect.value);
+    if (addedCount === 0) {
+        const statusDiv = document.getElementById('uploadStatus');
+        if (statusDiv) statusDiv.innerHTML = `❌ Error: No se encontraron archivos útiles o todos fueron ignorados.`;
+        return;
     }
     
-    if (accessToken) {
-        formData.append('user', currentUser?.id);
-    }
+
     
     const statusDiv = document.getElementById('uploadStatus');
-    if (statusDiv) statusDiv.textContent = `📤 Subiendo carpeta con ${files.length} archivos...`;
+    if (statusDiv) {
+        statusDiv.style.background = '#050508';
+        statusDiv.style.border = '1px solid #00f3ff';
+        statusDiv.style.padding = '15px';
+        statusDiv.style.borderRadius = '8px';
+        statusDiv.style.textAlign = 'left';
+        statusDiv.style.color = '#00f3ff';
+        statusDiv.style.fontFamily = 'monospace';
+        statusDiv.style.boxShadow = '0 0 15px rgba(0, 243, 255, 0.2)';
+        statusDiv.innerHTML = `> Iniciando protocolo de extracción...<br>> Analizando ${files.length} archivos...<br>> Ignorando dependencias y binarios...<br>> Empaquetando ${addedCount} archivos de código fuente...<br><span style="color:#b026ff; animation: blackHolePulse 1s infinite;">> Transfiriendo datos a TXT...</span>`;
+    }
     
     try {
         const res = await fetch('/p/api/upload-folder/', {
             method: 'POST',
-            body: formData,
-            headers: accessToken ? { 'Authorization': `Bearer ${accessToken}` } : {}
+            body: formData
         });
-        const data = await res.json();
-        
-        if (data.success) {
-            statusDiv.innerHTML = `✅ Subida carpeta con ${data.count} archivos correctamente`;
-            document.getElementById('successMessage').style.display = 'flex';
-            const fullUrl = `${window.location.origin}${data.url}`;
-            document.getElementById('generatedLink').innerHTML = `🔒 ${fullUrl}`;
-            document.getElementById('linkGenerated').style.display = 'flex';
-            setTimeout(() => window.location.href = data.url, 2000);
+        if (res.ok) {
+            const blob = await res.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${projectName}_cerbero.txt`;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            window.URL.revokeObjectURL(url);
+            
+            if (typeof playSciFiSound !== 'undefined') playSciFiSound('success');
+            if (statusDiv) statusDiv.innerHTML = `<span style="color:#00ff9d;">> [ACEPTADO]</span> Proyecto convertido y descargado exitosamente.`;
         } else {
-            statusDiv.innerHTML = `❌ Error: ${data.error}`;
+            try {
+                const data = await res.json();
+                if (typeof playSciFiSound !== 'undefined') playSciFiSound('error');
+                if (statusDiv) statusDiv.innerHTML = `<span style="color:#ff4444;">> [ERROR]</span> ${data.error || 'El proyecto está vacío o dañado.'}`;
+            } catch (e) {
+                if (typeof playSciFiSound !== 'undefined') playSciFiSound('error');
+                if (statusDiv) statusDiv.innerHTML = `<span style="color:#ff4444;">> [ERROR]</span> El proyecto está vacío, dañado o no contiene código fuente válido.`;
+            }
         }
     } catch(error) {
-        statusDiv.innerHTML = '❌ Error de conexión';
-    }
-}
-
-// Función para subir ZIP
-async function uploadZip(file) {
-    if (!file) return;
-    
-    const formData = new FormData();
-    formData.append('zip_file', file);
-    
-    const expirationSelect = document.getElementById('expirationSelect');
-    if (expirationSelect && expirationSelect.value) {
-        formData.append('expiration', expirationSelect.value);
-    }
-    
-    if (accessToken) {
-        formData.append('user', currentUser?.id);
-    }
-    
-    const statusDiv = document.getElementById('uploadStatus');
-    if (statusDiv) statusDiv.textContent = `📦 Subiendo y descomprimiendo ZIP...`;
-    
-    try {
-        const res = await fetch('/p/api/upload-zip/', {
-            method: 'POST',
-            body: formData,
-            headers: accessToken ? { 'Authorization': `Bearer ${accessToken}` } : {}
-        });
-        const data = await res.json();
-        
-        if (data.success) {
-            statusDiv.innerHTML = `✅ Subido ZIP con ${data.count} archivos descomprimidos`;
-            document.getElementById('successMessage').style.display = 'flex';
-            const fullUrl = `${window.location.origin}${data.url}`;
-            document.getElementById('generatedLink').innerHTML = `🔒 ${fullUrl}`;
-            document.getElementById('linkGenerated').style.display = 'flex';
-            setTimeout(() => window.location.href = data.url, 2000);
-        } else {
-            statusDiv.innerHTML = `❌ Error: ${data.error}`;
-        }
-    } catch(error) {
-        statusDiv.innerHTML = '❌ Error de conexión';
+        if (typeof playSciFiSound !== 'undefined') playSciFiSound('error');
+        if (statusDiv) statusDiv.innerHTML = `<span style="color:#ff4444;">> [ERROR DE RED]</span> El proyecto es demasiado pesado o hubo un fallo de conexión.`;
     }
 }
 
 // Event listeners
-document.getElementById('uploadFolderBtn')?.addEventListener('click', () => folderInput.click());
-document.getElementById('uploadZipBtn')?.addEventListener('click', () => zipInput.click());
-
 folderInput.onchange = (e) => {
     uploadFolder(Array.from(e.target.files));
     folderInput.value = '';
-};
-
-zipInput.onchange = (e) => {
-    if (e.target.files.length) {
-        uploadZip(e.target.files[0]);
-    }
-    zipInput.value = '';
 };
 
 // Arrastrar carpeta
@@ -988,13 +713,7 @@ uploadZone.addEventListener('drop', async (e) => {
     }
     
     if (files.length > 0) {
-        // Si hay un archivo .zip, procesarlo como ZIP
-        const zipFile = files.find(f => f.name.endsWith('.zip'));
-        if (zipFile && files.length === 1) {
-            uploadZip(zipFile);
-        } else {
-            uploadFolder(files);
-        }
+        uploadFolder(files);
     }
 });
 
@@ -1027,101 +746,6 @@ document.getElementById('docsBtn')?.addEventListener('click', () => {
     window.location.href = '/docs/';
 });
 
-// ==================== HISTORIAL DE PROYECTOS RECIENTES ====================
-
-function saveProjectToHistory(slug, title) {
-    try {
-        // Obtener historial actual
-        let history = JSON.parse(localStorage.getItem('cerbero_history') || '[]');
-        
-        // Eliminar si ya existe (para moverlo al frente)
-        history = history.filter(item => item.slug !== slug);
-        
-        // Agregar al principio
-        history.unshift({
-            slug: slug,
-            title: title || slug,
-            timestamp: Date.now(),
-            url: `/p/${slug}/`
-        });
-        
-        // Limitar a 10 proyectos
-        history = history.slice(0, 10);
-        
-        // Guardar
-        localStorage.setItem('cerbero_history', JSON.stringify(history));
-        
-        // Actualizar la vista
-        displayRecentProjects();
-    } catch(e) {
-        console.error('Error guardando historial:', e);
-    }
-}
-
-function displayRecentProjects() {
-    const container = document.getElementById('recentProjectsList');
-    if (!container) return;
-    
-    try {
-        const history = JSON.parse(localStorage.getItem('cerbero_history') || '[]');
-        
-        if (history.length === 0) {
-            container.innerHTML = '<p style="color: #888; text-align: center;">No has visitado ningún proyecto aún.</p>';
-            return;
-        }
-        
-        container.innerHTML = history.map(item => `
-            <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px; background: #12121a; border-radius: 8px; border-left: 3px solid #00f3ff;">
-                <div>
-                    <a href="${item.url}" style="color: #00f3ff; text-decoration: none; font-weight: bold;">📁 ${item.title}</a>
-                    <div style="color: #888; font-size: 0.7rem; margin-top: 4px;">
-                        ${formatTimestamp(item.timestamp)}
-                    </div>
-                </div>
-                <button onclick="removeFromHistory('${item.slug}')" style="background: transparent; border: none; color: #ff4444; cursor: pointer; font-size: 1.2rem;">🗑️</button>
-            </div>
-        `).join('');
-        
-    } catch(e) {
-        console.error('Error mostrando historial:', e);
-    }
-}
-
-function removeFromHistory(slug) {
-    try {
-        let history = JSON.parse(localStorage.getItem('cerbero_history') || '[]');
-        history = history.filter(item => item.slug !== slug);
-        localStorage.setItem('cerbero_history', JSON.stringify(history));
-        displayRecentProjects();
-    } catch(e) {
-        console.error('Error eliminando del historial:', e);
-    }
-}
-
-function clearRecentProjects() {
-    if (confirm('¿Estás seguro de que quieres borrar todo el historial?')) {
-        localStorage.removeItem('cerbero_history');
-        displayRecentProjects();
-    }
-}
-
-function formatTimestamp(timestamp) {
-    const now = Date.now();
-    const diff = now - timestamp;
-    const minutes = Math.floor(diff / 60000);
-    const hours = Math.floor(diff / 3600000);
-    const days = Math.floor(diff / 86400000);
-    
-    if (minutes < 1) return 'Justo ahora';
-    if (minutes < 60) return `Hace ${minutes} minuto${minutes !== 1 ? 's' : ''}`;
-    if (hours < 24) return `Hace ${hours} hora${hours !== 1 ? 's' : ''}`;
-    return `Hace ${days} día${days !== 1 ? 's' : ''}`;
-}
-
-// Llamar a displayRecentProjects al cargar la página
-document.addEventListener('DOMContentLoaded', function() {
-    displayRecentProjects();
-});
 
 // ==================== GUÍA DE FRAMEWORKS ====================
 const frameworkData = {

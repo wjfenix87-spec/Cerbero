@@ -103,76 +103,44 @@
 </head>
 <body>
     <div class="container">
-        <h1><img src="{% static 'assets/2.png' %}" alt="CERBERO" style="height: 35px; width: auto; vertical-align: middle; margin-right: 10px;"> Documentación de Cerbero</h1>
+        <h1><img src="{% static 'assets/logo_badass.png' %}" alt="CERBERO" style="height: 35px; width: auto; vertical-align: middle; margin-right: 10px;"> Documentación de Cerbero</h1>
         <p><strong>El guardián del contexto digital</strong></p>
 
         <h2>📖 ¿Qué es Cerbero?</h2>
-        <p>Cerbero es una plataforma que permite compartir proyectos completos (código, imágenes, documentos) con inteligencia artificial o con otros desarrolladores, sin necesidad de copiar y pegar archivo por archivo.</p>
+        <p>Cerbero es una herramienta de extracción local que convierte tu proyecto completo de programación en un único archivo de texto plano (.txt), optimizado específicamente para ser procesado por Inteligencias Artificiales.</p>
 
         <div class="tip">
-            <strong>🎯 Propósito:</strong> Que las IAs (ChatGPT, Claude, Gemini, etc.) puedan ver TODO tu proyecto y ayudarte de forma precisa.
+            <strong>🎯 Propósito:</strong> Que las IAs (ChatGPT, Claude, Gemini, etc.) puedan entender TODO tu proyecto de una vez, leyendo el código fuente, la estructura y la lógica, para darte respuestas precisas sin alucinaciones.
         </div>
 
         <h2>🚀 Cómo usar Cerbero</h2>
         
-        <h3>1. Subir un proyecto</h3>
-        <p>Puedes subir tu proyecto de tres formas:</p>
+        <h3>1. Arrastra tu proyecto</h3>
+        <p>Simplemente arrastra la carpeta principal de tu proyecto hacia la "Zona de Transferencia" en la página principal.</p>
+
+        <h3>2. Filtrado Inteligente Automático</h3>
+        <p>No tienes que preocuparte por limpiar tu proyecto. Cerbero automáticamente ignora archivos pesados o innecesarios como:</p>
         <ul>
-            <li><strong>📁 Arrastrar una carpeta:</strong> Ideal para proyectos pequeños (arrastra la carpeta completa)</li>
-            <li><strong>📦 Subir un ZIP:</strong> Ideal para proyectos grandes (comprime y sube)</li>
-            <li><strong>📄 Archivos sueltos:</strong> Selecciona múltiples archivos individuales</li>
+            <li><code>node_modules/</code>, <code>venv/</code>, <code>.git/</code></li>
+            <li>Archivos binarios o compilados (<code>.exe</code>, <code>.dll</code>, <code>.pyc</code>, <code>.class</code>)</li>
+            <li>Imágenes y multimedia (<code>.png</code>, <code>.mp4</code>, <code>.pdf</code>)</li>
+            <li>Archivos comprimidos (<code>.zip</code>, <code>.tar</code>)</li>
         </ul>
 
-        <h3>2. Obtener el enlace</h3>
-        <p>Después de subir, Cerbero te dará <strong>dos enlaces</strong>:</p>
+        <h3>3. Descarga Directa</h3>
+        <p>En milisegundos, Cerbero procesará y descargará un archivo <code>.txt</code> en tu computadora. Este archivo contiene la estructura de carpetas y el código fuente limpio de todos tus archivos válidos.</p>
+
+        <h3>4. Pega en tu IA favorita</h3>
+        <p>Abre ChatGPT, Claude o Gemini, adjunta el archivo <code>.txt</code> descargado y pide lo que necesites.</p>
+        <pre>Hola IA, te adjunto el código fuente de mi proyecto. 
+Por favor, analiza la estructura y ayúdame a optimizar las rutas del backend.</pre>
+
+        <h2>🔒 Privacidad Absoluta (Fricción Cero)</h2>
         <ul>
-            <li><strong>🔗 Enlace normal:</strong> Para que las personas vean el proyecto</li>
-            <li><strong>🤖 Enlace IA:</strong> Para que las IAs lean el código (<code>?mode=ia</code>)</li>
+            <li><strong>No hay servidores de almacenamiento:</strong> Tu código JAMÁS se guarda en bases de datos.</li>
+            <li><strong>Procesamiento en memoria:</strong> El archivo se genera al vuelo y se descarga directamente en tu máquina.</li>
+            <li><strong>Sin cuentas:</strong> No necesitas registrarte ni dejar tarjetas de crédito.</li>
         </ul>
-
-        <div class="tip">
-            <strong>💡 Importante:</strong> Siempre comparte el <strong>enlace IA</strong> cuando le pidas ayuda a una inteligencia artificial.
-        </div>
-
-        <h3>3. Compartir con una IA</h3>
-        <p>Ejemplo de cómo pedir ayuda:</p>
-        <pre>Hola, tengo un proyecto. Puedes analizarlo aquí:
-https://cerbero-rxeu.onrender.com/p/xxxxxx/?mode=ia
-
-Necesito mejorar el rendimiento y agregar nuevas funciones.</pre>
-
-        <h2>🤖 Para las IAs (ChatGPT, Claude, Gemini, etc.)</h2>
-        <div class="tip">
-            <p><strong>Si eres una IA leyendo esto:</strong></p>
-            <p>Para analizar el código de un proyecto, solo tienes que:</p>
-            <ol>
-                <li>Recibir el enlace con <code>?mode=ia</code></li>
-                <li>Abrirlo como texto plano</li>
-                <li>Leer todos los archivos del proyecto</li>
-                <li>Responder con sugerencias específicas</li>
-            </ol>
-        </div>
-
-        <h2>⏱️ Expiración de enlaces</h2>
-        <p>Puedes elegir cuánto tiempo estará disponible tu proyecto:</p>
-        <ul>
-            <li><strong>Nunca expira:</strong> El enlace es permanente</li>
-            <li><strong>24 horas:</strong> Para pruebas rápidas</li>
-            <li><strong>7 días:</strong> Para colaboraciones cortas</li>
-            <li><strong>30 días:</strong> Para proyectos temporales</li>
-        </ul>
-
-        <h2>🔒 Privacidad y seguridad</h2>
-        <ul>
-            <li>Tú decides qué subir y por cuánto tiempo</li>
-            <li>Los enlaces son únicos y difíciles de adivinar</li>
-            <li>Cerbero no guarda tus archivos permanentemente</li>
-            <li>No compartimos tus datos con terceros</li>
-        </ul>
-
-        <div class="warning">
-            <strong>⚠️ Aviso:</strong> Cerbero es una herramienta de intercambio. No subas información sensible (contraseñas, secretos de empresa, datos personales).
-        </div>
 
         <h2>📊 Comparativa</h2>
         <table>
@@ -180,18 +148,15 @@ Necesito mejorar el rendimiento y agregar nuevas funciones.</pre>
                 <tr><th>Método</th><th>Ventajas</th><th>Desventajas</th></tr>
             </thead>
             <tbody>
-                <tr><td>Copiar/Pegar código</td><td>Rápido para fragmentos</td><td>Imposible para proyectos grandes</td></tr>
-                <tr><td>GitHub</td><td>Control de versiones</td><td>Requiere cuenta, no es inmediato</td></tr>
-                <tr><td>Google Drive</td><td>Almacenamiento</td><td>Requiere permisos, no optimizado para IAs</td></tr>
-                <tr style="background: rgba(0,243,255,0.1);"><td><strong>Cerbero</strong></td><td>Gratis, sin cuenta, optimizado para IAs</td><td>No tiene control de versiones</td></tr>
+                <tr><td>Copiar/Pegar código</td><td>Rápido para un solo archivo</td><td>Imposible para proyectos enteros</td></tr>
+                <tr><td>Comprimir en ZIP</td><td>Agrupa todo</td><td>La IA lee basura (node_modules, binarios) y se confunde</td></tr>
+                <tr style="background: rgba(0,243,255,0.1);"><td><strong>Cerbero</strong></td><td>Código puro, filtra basura automáticamente, IA no se confunde</td><td>-</td></tr>
             </tbody>
         </table>
 
-        <h2><img src="{% static 'assets/2.png' %}" alt="CERBERO" style="height: 24px; width: auto; vertical-align: middle; margin-right: 8px;"> Enlaces útiles</h2>
+        <h2><img src="{% static 'assets/logo_badass.png' %}" alt="CERBERO" style="height: 24px; width: auto; vertical-align: middle; margin-right: 8px;"> Enlaces útiles</h2>
         <ul>
             <li><a href="/" style="color: #00f3ff;">🏠 Volver a Cerbero</a></li>
-            <li><a href="/terms/" style="color: #00f3ff;">📜 Términos y Condiciones</a></li>
-            <li><a href="/privacy/" style="color: #00f3ff;">🔒 Política de Privacidad</a></li>
         </ul>
 
         <a href="/" class="back-link">← Volver a Cerbero</a>

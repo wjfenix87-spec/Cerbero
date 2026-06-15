@@ -256,3 +256,5 @@ if not DEBUG:
 # File Upload Limits
 DATA_UPLOAD_MAX_MEMORY_SIZE = 52428800  # 50MB
 FILE_UPLOAD_MAX_MEMORY_SIZE = 52428800  # 50MB
+DATA_UPLOAD_MAX_NUMBER_FIELDS = None  # Desactivar límite de campos para proyectos inmensos
+DATA_UPLOAD_MAX_NUMBER_FILES = 100000  # Aumentado para evitar el error 400 con proyectos muy grandes
