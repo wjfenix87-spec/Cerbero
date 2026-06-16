@@ -73,3 +73,15 @@ class ProjectFile(models.Model):
         indexes = [
             models.Index(fields=['project', 'uploaded_at']),
         ]
+
+class ExtractionLog(models.Model):
+    file_count = models.IntegerField(default=0, verbose_name="Archivos Procesados")
+    created_at = models.DateTimeField(default=timezone.now, verbose_name="Fecha de Extracción")
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = "Extracción Anónima"
+        verbose_name_plural = "Historial de Uso"
+
+    def __str__(self):
+        return f"[{self.created_at.strftime('%Y-%m-%d %H:%M')}] Extracción anónima ({self.file_count} archivos)"

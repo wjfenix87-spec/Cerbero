@@ -2,6 +2,7 @@ from django.http import HttpResponse, JsonResponse
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
 from .utils import is_file_allowed, get_gitignore_spec
+from .models import ExtractionLog
 import logging
 import os
 
@@ -64,12 +65,14 @@ def upload_folder(request):
         # ===== GENERAR ARCHIVO TXT =====
         response_lines = []
         response_lines.append("=" * 60)
-        response_lines.append("CONTEXTO DE PROYECTO PARA INTELIGENCIA ARTIFICIAL (Vía Cerbero)")
+        response_lines.append("SYSTEM INITIALIZATION: CERBERUS PROTOCOL ENGAGED")
         response_lines.append("=" * 60)
-        response_lines.append("¡Hola! Te presento el código fuente completo de este proyecto.")
-        response_lines.append("A continuación encontrarás la estructura y el contenido de todos")
-        response_lines.append("los archivos relevantes. Por favor, lee y analiza todo este")
-        response_lines.append("contexto antes de responder a mis consultas o sugerir cambios.")
+        response_lines.append("The following is the complete, raw source code of a software project.")
+        response_lines.append("As an advanced AI assistant, your directive is to thoroughly analyze")
+        response_lines.append("the architecture, logic, and dependencies of this codebase.")
+        response_lines.append("Please assume the role of a Principal Software Engineer.")
+        response_lines.append("All your subsequent responses must be in SPANISH (Español), highly")
+        response_lines.append("technical, concise, and directly address the context provided below.")
         response_lines.append("")
         response_lines.append(f"Archivos de código procesados: {len(filtered_files)}")
         response_lines.append(f"Archivos irrelevantes ignorados: {ignored_count}")
@@ -101,6 +104,15 @@ def upload_folder(request):
         response = HttpResponse(txt_content, content_type='text/plain; charset=utf-8')
         response['Content-Disposition'] = 'attachment; filename="cerbero_proyecto.txt"'
         response['Access-Control-Expose-Headers'] = 'Content-Disposition'
+        
+        # ===== REGISTRO ANÓNIMO =====
+        try:
+            ExtractionLog.objects.create(
+                file_count=len(filtered_files)
+            )
+        except Exception as log_e:
+            logger.error(f"Error guardando el log de extracción: {log_e}")
+            
         return response
         
     except Exception as e:
