@@ -102,7 +102,7 @@ def upload_folder(request):
         txt_content = "\n".join(response_lines)
         
         response = HttpResponse(txt_content, content_type='text/plain; charset=utf-8')
-        response['Content-Disposition'] = 'attachment; filename="cerbero_proyecto.txt"'
+        response['Content-Disposition'] = 'attachment; filename="proyecto.txt"'
         response['Access-Control-Expose-Headers'] = 'Content-Disposition'
         
         # ===== REGISTRO ANÓNIMO =====
