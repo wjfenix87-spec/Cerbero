@@ -2,7 +2,7 @@ from django.http import HttpResponse, JsonResponse
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
 from .utils import is_file_allowed, get_gitignore_spec
-from .models import ExtractionLog
+from .models import GlobalCounter
 import logging
 import os
 
@@ -107,11 +107,11 @@ def upload_folder(request):
         
         # ===== REGISTRO ANÓNIMO =====
         try:
-            ExtractionLog.objects.create(
-                file_count=len(filtered_files)
-            )
+            counter, created = GlobalCounter.objects.get_or_create(id=1)
+            counter.total_extractions += 1
+            counter.save()
         except Exception as log_e:
-            logger.error(f"Error guardando el log de extracción: {log_e}")
+            logger.error(f"Error actualizando el contador global: {log_e}")
             
         return response
         
