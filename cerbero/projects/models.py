@@ -59,7 +59,7 @@ class Project(models.Model):
 
 class ProjectFile(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='files', db_index=True)
-    file = models.FileField(upload_to='projects/%Y/%m/%d/')
+    file = models.FileField(upload_to='projects/%Y/%m/%d/', max_length=500)
     original_name = models.CharField(max_length=255, db_index=True)
     size = models.IntegerField()
     file_type = models.CharField(max_length=100)
