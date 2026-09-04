@@ -642,6 +642,18 @@ async function uploadFolder(files) {
     const formData = new FormData();
     let addedCount = 0;
     
+// Función para procesar carpeta 100% LOCALMENTE en el navegador
+async function uploadFolder(files) {
+    if (!files.length) return;
+    
+    let projectName = "cerbero_proyecto";
+    if (files.length > 0 && files[0].webkitRelativePath) {
+        const parts = files[0].webkitRelativePath.split('/');
+        if (parts.length > 0 && parts[0]) {
+            projectName = parts[0];
+        }
+    }
+    
     // Lista básica de carpetas y archivos a ignorar en el frontend para no saturar el servidor
     const ignorePatterns = [
         '/node_modules/', '\\node_modules\\', '/venv/', '/.venv/', '/env/', '/.env',
@@ -650,6 +662,9 @@ async function uploadFolder(files) {
         '.exe', '.dll', '.so', '.dylib', '.pyc', '.pyo', '.pyd',
         '.jpg', '.jpeg', '.png', '.gif', '.ico', '.webp', '.mp4', '.mp3', '.pdf', '.zip', '.rar', '.tar', '.gz'
     ];
+    
+    let validFiles = [];
+    let ignoredCount = 0;
     
     for (let file of files) {
         const relativePath = file.webkitRelativePath || file.name;
@@ -663,24 +678,22 @@ async function uploadFolder(files) {
         }
         
         if (!shouldIgnore) {
-            formData.append('files', file);
-            formData.append('paths', relativePath);
-            addedCount++;
+            validFiles.push(file);
+        } else {
+            ignoredCount++;
         }
     }
     
-    if (addedCount === 0) {
-        const statusDiv = document.getElementById('uploadStatus');
+    const statusDiv = document.getElementById('uploadStatus');
+    
+    if (validFiles.length === 0) {
         if (statusDiv) statusDiv.innerHTML = `❌ Error: No se encontraron archivos útiles o todos fueron ignorados.`;
         return;
     }
     
-
-    
     const exportFormat = document.querySelector('input[name="exportFormat"]:checked')?.value || 'txt';
     const formatName = exportFormat === 'md' ? 'MARKDOWN' : 'TXT';
     
-    const statusDiv = document.getElementById('uploadStatus');
     if (statusDiv) {
         statusDiv.style.background = '#050508';
         statusDiv.style.border = '1px solid #00f3ff';
@@ -690,42 +703,71 @@ async function uploadFolder(files) {
         statusDiv.style.color = '#00f3ff';
         statusDiv.style.fontFamily = 'monospace';
         statusDiv.style.boxShadow = '0 0 15px rgba(0, 243, 255, 0.2)';
-        statusDiv.innerHTML = `> Iniciando protocolo de extracción...<br>> Analizando ${files.length} archivos...<br>> Ignorando dependencias y binarios...<br>> Empaquetando ${addedCount} archivos de código fuente...<br><span style="color:#b026ff; animation: blackHolePulse 1s infinite;">> Transfiriendo datos a ${formatName}...</span>`;
+        statusDiv.innerHTML = `> Iniciando protocolo de extracción 100% LOCAL...<br>> Analizando ${files.length} archivos en total...<br>> Ignorando dependencias y binarios (${ignoredCount} ignorados)...<br>> Procesando ${validFiles.length} archivos de código fuente en RAM...<br><span style="color:#b026ff; animation: blackHolePulse 1s infinite;">> Generando archivo ${formatName}...</span>`;
     }
-    
-    formData.append('exportFormat', exportFormat);
 
     try {
-        const res = await fetch('/p/api/upload-folder/', {
-            method: 'POST',
-            body: formData
-        });
-        if (res.ok) {
-            const blob = await res.blob();
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `${projectName}.${exportFormat}`;
-            document.body.appendChild(a);
-            a.click();
-            a.remove();
-            window.URL.revokeObjectURL(url);
+        let outputLines = [];
+        outputLines.push("=".repeat(60));
+        outputLines.push("SYSTEM INITIALIZATION: CERBERUS PROTOCOL ENGAGED");
+        outputLines.push("=".repeat(60));
+        outputLines.push("The following is the complete, raw source code of a software project.");
+        outputLines.push("As an advanced AI assistant, your directive is to thoroughly analyze");
+        outputLines.push("the architecture, logic, and dependencies of this codebase.");
+        outputLines.push("Please assume the role of a Principal Software Engineer.");
+        outputLines.push("All your subsequent responses must be in SPANISH (Español), highly");
+        outputLines.push("technical, concise, and directly address the context provided below.");
+        outputLines.push("");
+        outputLines.push(`Archivos de código procesados localmente: ${validFiles.length}`);
+        outputLines.push("=".repeat(60) + "\n");
+
+        for (let file of validFiles) {
+            const path = file.webkitRelativePath || file.name;
+            outputLines.push(`## ${path}`);
+            outputLines.push("-".repeat(40));
             
-            if (typeof playSciFiSound !== 'undefined') playSciFiSound('success');
-            if (statusDiv) statusDiv.innerHTML = `<span style="color:#00ff9d;">> [ACEPTADO]</span> Proyecto convertido y descargado exitosamente.`;
-        } else {
             try {
-                const data = await res.json();
-                if (typeof playSciFiSound !== 'undefined') playSciFiSound('error');
-                if (statusDiv) statusDiv.innerHTML = `<span style="color:#ff4444;">> [ERROR]</span> ${data.error || 'El proyecto está vacío o dañado.'}`;
+                let content = await file.text();
+                // Truncar archivos gigantes (25,000 caracteres)
+                if (content.length > 25000) {
+                    content = content.substring(0, 25000) + "\n... [CONTENIDO TRUNCADO]";
+                }
+                
+                // Intentar sacar el lenguaje
+                let ext = path.split('.').pop().toLowerCase();
+                if (ext === path.toLowerCase()) ext = 'text'; // Sin extensión
+                
+                outputLines.push("```" + ext);
+                outputLines.push(content);
+                outputLines.push("```");
             } catch (e) {
-                if (typeof playSciFiSound !== 'undefined') playSciFiSound('error');
-                if (statusDiv) statusDiv.innerHTML = `<span style="color:#ff4444;">> [ERROR]</span> El proyecto está vacío, dañado o no contiene código fuente válido.`;
+                outputLines.push("[ARCHIVO BINARIO O ILEGIBLE - Ignorado]");
             }
+            outputLines.push("\n" + "=".repeat(60) + "\n");
         }
+
+        const blobContent = outputLines.join("\n");
+        const blobType = exportFormat === 'md' ? 'text/markdown;charset=utf-8' : 'text/plain;charset=utf-8';
+        const blob = new Blob([blobContent], { type: blobType });
+        
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${projectName}.${exportFormat}`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(url);
+        
+        if (typeof playSciFiSound !== 'undefined') playSciFiSound('success');
+        if (statusDiv) statusDiv.innerHTML = `<span style="color:#00ff9d;">> [ÉXITO]</span> Proyecto procesado LOCALMENTE de forma ultra-rápida y descargado.`;
+
+        // Actualizar el contador del servidor en segundo plano
+        fetch('/p/api/upload-folder/', { method: 'POST', body: new FormData() }).catch(()=>console.log("Stats ping"));
+
     } catch(error) {
         if (typeof playSciFiSound !== 'undefined') playSciFiSound('error');
-        if (statusDiv) statusDiv.innerHTML = `<span style="color:#ff4444;">> [ERROR DE RED]</span> El proyecto es demasiado pesado o hubo un fallo de conexión.`;
+        if (statusDiv) statusDiv.innerHTML = `<span style="color:#ff4444;">> [ERROR]</span> Ocurrió un error leyendo los archivos: ${error.message}`;
     }
 }
 
