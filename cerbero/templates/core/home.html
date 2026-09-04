@@ -432,6 +432,17 @@
                 </div>
             </div>
             </div>
+            
+            <!-- Selector de formato -->
+            <div id="formatSelector" style="text-align: center; margin-bottom: 20px; font-family: 'Space Grotesk', sans-serif;">
+                <label style="color: rgba(255,255,255,0.7); margin-right: 15px; font-size: 14px;">Formato de salida:</label>
+                <label style="cursor: pointer; color: #00f3ff; margin-right: 20px; font-weight: 600; padding: 5px 10px; border: 1px solid rgba(0,243,255,0.3); border-radius: 8px; background: rgba(0,0,0,0.4);">
+                    <input type="radio" name="exportFormat" value="txt" checked style="accent-color: #00f3ff;"> .TXT
+                </label>
+                <label style="cursor: pointer; color: #b026ff; font-weight: 600; padding: 5px 10px; border: 1px solid rgba(176,38,255,0.3); border-radius: 8px; background: rgba(0,0,0,0.4);">
+                    <input type="radio" name="exportFormat" value="md" style="accent-color: #b026ff;"> .MD (Markdown)
+                </label>
+            </div>
 
             <!-- Estado de subida -->
             <div id="uploadStatus" style="margin-bottom: 25px; text-align: center; color: #00ff9d; font-family: monospace;"></div>
@@ -644,6 +655,9 @@ async function uploadFolder(files) {
         statusDiv.innerHTML = `> Iniciando protocolo de extracción...<br>> Analizando ${files.length} archivos...<br>> Ignorando dependencias y binarios...<br>> Empaquetando ${addedCount} archivos de código fuente...<br><span style="color:#b026ff; animation: blackHolePulse 1s infinite;">> Transfiriendo datos a TXT...</span>`;
     }
     
+    const exportFormat = document.querySelector('input[name="exportFormat"]:checked')?.value || 'txt';
+    formData.append('exportFormat', exportFormat);
+
     try {
         const res = await fetch('/p/api/upload-folder/', {
             method: 'POST',
@@ -654,7 +668,7 @@ async function uploadFolder(files) {
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `${projectName}.txt`;
+            a.download = `${projectName}.${exportFormat}`;
             document.body.appendChild(a);
             a.click();
             a.remove();
