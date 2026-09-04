@@ -433,15 +433,26 @@
             </div>
             </div>
             
-            <!-- Selector de formato -->
-            <div id="formatSelector" style="text-align: center; margin-bottom: 20px; font-family: 'Space Grotesk', sans-serif;">
-                <label style="color: rgba(255,255,255,0.7); margin-right: 15px; font-size: 14px;">Formato de salida:</label>
-                <label style="cursor: pointer; color: #00f3ff; margin-right: 20px; font-weight: 600; padding: 5px 10px; border: 1px solid rgba(0,243,255,0.3); border-radius: 8px; background: rgba(0,0,0,0.4);">
-                    <input type="radio" name="exportFormat" value="txt" checked style="accent-color: #00f3ff;"> .TXT
-                </label>
-                <label style="cursor: pointer; color: #b026ff; font-weight: 600; padding: 5px 10px; border: 1px solid rgba(176,38,255,0.3); border-radius: 8px; background: rgba(0,0,0,0.4);">
-                    <input type="radio" name="exportFormat" value="md" style="accent-color: #b026ff;"> .MD (Markdown)
-                </label>
+            <!-- Zona de Confirmación (Oculta por defecto) -->
+            <div id="confirmZone" style="display: none; background: rgba(0,0,0,0.3); border: 2px dashed rgba(176,38,255,0.4); border-radius: 14px; padding: 30px 20px; text-align: center; margin-bottom: 30px; transition: all 0.3s ease;">
+                <div style="font-size: 32px; margin-bottom: 10px;">📦</div>
+                <p style="font-size: 16px; font-weight: 600; margin: 0; color: #fff;">Carpeta cargada y lista</p>
+                <small style="font-size: 12px; opacity: 0.6; color: #b026ff;">Elige el formato en el que deseas extraer el código</small>
+                
+                <div style="margin: 20px 0; font-family: 'Space Grotesk', sans-serif;">
+                    <label style="color: rgba(255,255,255,0.7); margin-right: 15px; font-size: 14px;">Formato:</label>
+                    <label style="cursor: pointer; color: #00f3ff; margin-right: 20px; font-weight: 600; padding: 5px 10px; border: 1px solid rgba(0,243,255,0.3); border-radius: 8px; background: rgba(0,0,0,0.4);">
+                        <input type="radio" name="exportFormat" value="txt" checked style="accent-color: #00f3ff;"> .TXT
+                    </label>
+                    <label style="cursor: pointer; color: #b026ff; font-weight: 600; padding: 5px 10px; border: 1px solid rgba(176,38,255,0.3); border-radius: 8px; background: rgba(0,0,0,0.4);">
+                        <input type="radio" name="exportFormat" value="md" style="accent-color: #b026ff;"> .MD
+                    </label>
+                </div>
+
+                <div style="display: flex; justify-content: center; gap: 15px;">
+                    <button onclick="cancelUpload()" style="padding: 10px 20px; background: transparent; border: 1px solid #ff4444; color: #ff4444; cursor: pointer; border-radius: 8px; transition: all 0.3s;">Cancelar</button>
+                    <button onclick="confirmUpload()" style="padding: 10px 30px; background: linear-gradient(135deg, #00f3ff, #b026ff); border: none; color: #fff; cursor: pointer; border-radius: 8px; font-weight: bold; transition: all 0.3s;">Generar y Descargar</button>
+                </div>
             </div>
 
             <!-- Estado de subida -->
@@ -538,7 +549,7 @@
             uploadZone.addEventListener('drop', (e) => {
                 e.preventDefault();
                 uploadZone.classList.remove('black-hole-active');
-                uploadFolder(Array.from(e.dataTransfer.files));
+                prepareUpload(Array.from(e.dataTransfer.files));
             });
             
             console.log('✅ Zona de transferencia Modo Dios activada');
@@ -591,6 +602,30 @@ folderInput.style.display = 'none';
 document.body.appendChild(folderInput);
 
 
+
+let pendingUploadFiles = [];
+
+function prepareUpload(files) {
+    if (!files.length) return;
+    pendingUploadFiles = files;
+    document.getElementById('uploadZone').style.display = 'none';
+    document.getElementById('confirmZone').style.display = 'block';
+    const statusDiv = document.getElementById('uploadStatus');
+    if (statusDiv) statusDiv.innerHTML = '';
+}
+
+window.cancelUpload = function() {
+    pendingUploadFiles = [];
+    document.getElementById('confirmZone').style.display = 'none';
+    document.getElementById('uploadZone').style.display = 'block';
+    folderInput.value = '';
+};
+
+window.confirmUpload = function() {
+    document.getElementById('confirmZone').style.display = 'none';
+    document.getElementById('uploadZone').style.display = 'block';
+    uploadFolder(pendingUploadFiles);
+};
 
 // Función para subir carpeta
 async function uploadFolder(files) {
@@ -696,8 +731,7 @@ async function uploadFolder(files) {
 
 // Event listeners
 folderInput.onchange = (e) => {
-    uploadFolder(Array.from(e.target.files));
-    folderInput.value = '';
+    prepareUpload(Array.from(e.target.files));
 };
 
 // Arrastrar carpeta
