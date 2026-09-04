@@ -642,6 +642,9 @@ async function uploadFolder(files) {
     
 
     
+    const exportFormat = document.querySelector('input[name="exportFormat"]:checked')?.value || 'txt';
+    const formatName = exportFormat === 'md' ? 'MARKDOWN' : 'TXT';
+    
     const statusDiv = document.getElementById('uploadStatus');
     if (statusDiv) {
         statusDiv.style.background = '#050508';
@@ -652,10 +655,9 @@ async function uploadFolder(files) {
         statusDiv.style.color = '#00f3ff';
         statusDiv.style.fontFamily = 'monospace';
         statusDiv.style.boxShadow = '0 0 15px rgba(0, 243, 255, 0.2)';
-        statusDiv.innerHTML = `> Iniciando protocolo de extracción...<br>> Analizando ${files.length} archivos...<br>> Ignorando dependencias y binarios...<br>> Empaquetando ${addedCount} archivos de código fuente...<br><span style="color:#b026ff; animation: blackHolePulse 1s infinite;">> Transfiriendo datos a TXT...</span>`;
+        statusDiv.innerHTML = `> Iniciando protocolo de extracción...<br>> Analizando ${files.length} archivos...<br>> Ignorando dependencias y binarios...<br>> Empaquetando ${addedCount} archivos de código fuente...<br><span style="color:#b026ff; animation: blackHolePulse 1s infinite;">> Transfiriendo datos a ${formatName}...</span>`;
     }
     
-    const exportFormat = document.querySelector('input[name="exportFormat"]:checked')?.value || 'txt';
     formData.append('exportFormat', exportFormat);
 
     try {
