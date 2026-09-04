@@ -415,7 +415,9 @@
         </div>
 
         <!-- ZONA DE TRANSFERENCIA HORIZONTAL (ABAJO) -->
-        <div class="upload-zone-cyber" id="uploadZone" style="cursor: pointer; padding: 25px 30px;">
+        <div class="upload-zone-cyber" id="uploadZone" style="cursor: pointer; padding: 25px 30px;" onclick="document.getElementById('folderInput').click()">
+            <input type="file" id="folderInput" webkitdirectory directory multiple style="display: none;" onchange="if(this.files.length) { prepareUpload(Array.from(this.files)); this.value=''; }">
+            
             <!-- Cabecera -->
             <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid rgba(0, 243, 255, 0.2);">
                 <span style="font-size: 28px;">📦</span>
@@ -424,14 +426,14 @@
             </div>
 
             <!-- Fila horizontal: arrastre + botones + expiración -->
-            <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap; margin-bottom: 30px;">
+            <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap; margin-bottom: 30px; pointer-events: none;">
                 <div style="flex: 1; min-width: 200px; background: rgba(0,0,0,0.3); border: 2px dashed rgba(0,243,255,0.4); border-radius: 14px; padding: 30px 20px; text-align: center; transition: all 0.3s ease;" class="hover-glow">
                     <div style="font-size: 32px; margin-bottom: 10px;">📁</div>
                     <p style="font-size: 16px; font-weight: 600; margin: 0; color: #fff;">Arrastra tu CARPETA o Haz Clic Aquí</p>
                     <small style="font-size: 12px; opacity: 0.6; color: #00f3ff;">Proyectos pequeños o inmensos</small>
                 </div>
             </div>
-            </div>
+        </div>
             
             <!-- Zona de Confirmación (Oculta por defecto) -->
             <div id="confirmZone" style="display: none; background: rgba(0,0,0,0.3); border: 2px dashed rgba(176,38,255,0.4); border-radius: 14px; padding: 30px 20px; text-align: center; margin-bottom: 30px; transition: all 0.3s ease;">
@@ -495,14 +497,6 @@
     </footer>
 
     <script>
-        // ==================== SUBIR CARPETA ====================
-        const folderInput = document.createElement('input');
-        folderInput.type = 'file';
-        folderInput.multiple = true;
-        folderInput.webkitdirectory = true;  // 👈 PERMITE SELECCIONAR CARPETA
-        folderInput.directory = true;
-        folderInput.style.display = 'none';
-        document.body.appendChild(folderInput);
 
         const uploadZone = document.getElementById('uploadZone');
         if (uploadZone) {
@@ -539,32 +533,11 @@
                 }
             }
 
-            uploadZone.addEventListener('click', () => {
-                folderInput.click();
-            });
-
-            let lastHoverSound = 0;
-            uploadZone.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                uploadZone.classList.add('black-hole-active');
-                if (Date.now() - lastHoverSound > 800) { playSciFiSound('hover'); lastHoverSound = Date.now(); }
-            });
-            
-            uploadZone.addEventListener('dragleave', () => {
-                uploadZone.classList.remove('black-hole-active');
-            });
-            
-            uploadZone.addEventListener('drop', (e) => {
-                e.preventDefault();
-                uploadZone.classList.remove('black-hole-active');
-                prepareUpload(Array.from(e.dataTransfer.files));
-            });
-            
             console.log('✅ Zona de transferencia Modo Dios activada');
         }
         
-        document.getElementById('openUploadBtn')?.addEventListener('click', () => folderInput.click());
-        document.getElementById('ctaUploadBtn')?.addEventListener('click', () => folderInput.click());
+        document.getElementById('openUploadBtn')?.addEventListener('click', () => document.getElementById('folderInput').click());
+        document.getElementById('ctaUploadBtn')?.addEventListener('click', () => document.getElementById('folderInput').click());
         
         function init() {
             if (featuresGrid) {
@@ -625,20 +598,7 @@ window.confirmUpload = function() {
     uploadFolder(pendingUploadFiles);
 };
 
-// Función para subir carpeta
-async function uploadFolder(files) {
-    if (!files.length) return;
-    
-    let projectName = "cerbero_proyecto";
-    if (files.length > 0 && files[0].webkitRelativePath) {
-        const parts = files[0].webkitRelativePath.split('/');
-        if (parts.length > 0 && parts[0]) {
-            projectName = parts[0];
-        }
-    }
-    
-    const formData = new FormData();
-    let addedCount = 0;
+// (Removed leftover code)
     
 // Función para procesar carpeta 100% LOCALMENTE en el navegador
 async function uploadFolder(files) {
@@ -769,10 +729,7 @@ async function uploadFolder(files) {
     }
 }
 
-// Event listeners
-folderInput.onchange = (e) => {
-    prepareUpload(Array.from(e.target.files));
-};
+// (Eliminado onchange duplicado)
 
 // Arrastrar carpeta
 uploadZone.addEventListener('dragover', (e) => {
@@ -790,7 +747,10 @@ uploadZone.addEventListener('drop', async (e) => {
     e.preventDefault();
     uploadZone.style.borderColor = 'rgba(0, 243, 255, 0.3)';
     uploadZone.style.background = 'var(--dark-3)';
+    uploadZone.classList.remove('black-hole-active');
     
+    if (typeof playSciFiSound !== 'undefined') playSciFiSound('hover');
+
     const items = e.dataTransfer.items;
     const files = [];
     
@@ -803,7 +763,10 @@ uploadZone.addEventListener('drop', async (e) => {
     }
     
     if (files.length > 0) {
-        uploadFolder(files);
+        prepareUpload(files); // <= AQUÍ ESTABA EL CONFLICTO
+    } else {
+        // Fallback si no soporta webkitGetAsEntry
+        prepareUpload(Array.from(e.dataTransfer.files));
     }
 });
 
