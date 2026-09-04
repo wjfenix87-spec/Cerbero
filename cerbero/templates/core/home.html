@@ -495,6 +495,14 @@
     </footer>
 
     <script>
+        // ==================== SUBIR CARPETA ====================
+        const folderInput = document.createElement('input');
+        folderInput.type = 'file';
+        folderInput.multiple = true;
+        folderInput.webkitdirectory = true;  // 👈 PERMITE SELECCIONAR CARPETA
+        folderInput.directory = true;
+        folderInput.style.display = 'none';
+        document.body.appendChild(folderInput);
 
         const uploadZone = document.getElementById('uploadZone');
         if (uploadZone) {
@@ -592,17 +600,7 @@
         
         window.copyLink = () => { navigator.clipboard.writeText(document.getElementById('generatedLink')?.innerText.replace('🔒 ', '') || ''); alert('Enlace copiado'); };
    
-   // ==================== SUBIR CARPETA ====================
-const folderInput = document.createElement('input');
-folderInput.type = 'file';
-folderInput.multiple = true;
-folderInput.webkitdirectory = true;  // 👈 PERMITE SELECCIONAR CARPETA
-folderInput.directory = true;
-folderInput.style.display = 'none';
-document.body.appendChild(folderInput);
-
-
-
+// (Input movido al inicio del script)
 let pendingUploadFiles = [];
 
 function prepareUpload(files) {
